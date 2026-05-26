@@ -1,5 +1,7 @@
 import { ok, fail, requireAuth } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
+import { calculateAnnualLeaveDays } from "@/lib/leave";
+import { leaveTypeSchema } from "@/lib/leave-types";
 import { z } from "zod/v4";
 
 // 영업일 수 계산 (주말 제외)
@@ -66,7 +68,7 @@ export async function GET(req: Request) {
 }
 
 const createSchema = z.object({
-  type: z.enum(["ANNUAL", "HALF_DAY", "SICK", "PUBLIC", "SPECIAL"]),
+  type: leaveTypeSchema,
   halfDayType: z.enum(["AM", "PM"]).optional(),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -102,10 +104,22 @@ export async function POST(req: Request) {
 
   // 연차/반차의 경우 잔여일수 확인
   if (data.type === "ANNUAL" || data.type === "HALF_DAY") {
-    const balance = await prisma.leaveBalance.findUnique({
-      where: { userId_year: { userId, year } },
-    });
-    const totalDays = balance ? Number(balance.totalDays) + Number(balance.carryOverDays) : 15;
+    const [balance, user] = await Promise.all([
+      prisma.leaveBalance.findUnique({
+        where: { userId_year: { userId, year } },
+      }),
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { joinedAt: true },
+      }),
+    ]);
+
+    const defaultTotalDays = user
+      ? calculateAnnualLeaveDays(user.joinedAt, year)
+      : 0;
+    const totalDays = balance
+      ? Number(balance.totalDays) + Number(balance.carryOverDays)
+      : defaultTotalDays;
     const usedDays = balance ? Number(balance.usedDays) : 0;
     const remaining = totalDays - usedDays;
     if (days > remaining) {
@@ -124,21 +138,26 @@ export async function POST(req: Request) {
   });
   if (overlap) return fail("해당 기간에 이미 휴가 신청이 존재합니다", 409);
 
-  const request = await prisma.leaveRequest.create({
-    data: {
-      userId,
-      type: data.type,
-      halfDayType: data.halfDayType ?? null,
-      startDate: start,
-      endDate: end,
-      days,
-      reason: data.reason,
-      status: "PENDING",
-    },
-    include: {
-      user: { select: { id: true, name: true } },
-    },
-  });
+  try {
+    const request = await prisma.leaveRequest.create({
+      data: {
+        userId,
+        type: data.type,
+        halfDayType: data.halfDayType ?? null,
+        startDate: start,
+        endDate: end,
+        days,
+        reason: data.reason,
+        status: "PENDING",
+      },
+      include: {
+        user: { select: { id: true, name: true } },
+      },
+    });
 
-  return ok(request, 201);
+    return ok(request, 201);
+  } catch (error) {
+    console.error("[POST /api/leave/requests]", error);
+    return fail("휴가 신청 저장 중 오류가 발생했습니다", 500);
+  }
 }

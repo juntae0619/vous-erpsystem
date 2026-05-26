@@ -1,11 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "../styles/shadcn.css";
 
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   DESIGN SYSTEM — ClickUp™ Style (DESIGN.md 기반)
+   DESIGN SYSTEM — ClickUp™ Style (DESIGN.md)
    ============================================================ */
 
 @theme inline {
@@ -56,11 +56,11 @@
   --color-warm-fade: #ff5b36;
 
   /* 타이포그래피 */
-  --font-plus-jakarta-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-inter: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-sometype-mono: 'Sometype Mono', ui-monospace, monospace;
+  --font-plus-jakarta-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sometype-mono: "Sometype Mono", ui-monospace, monospace;
 
-  /* 테두리 반경 — DESIGN.md 값 */
+  /* 테두리 반경 — DESIGN.md */
   --radius-sm: 4px;
   --radius-md: 9px;
   --radius-lg: 9px;
@@ -69,18 +69,27 @@
   --radius-3xl: 24px;
   --radius-full: 54px;
   --radius-circle: 653px;
+  --radius-buttons: 9px;
+  --radius-cards: 12px;
+  --radius-pills: 54px;
+  --radius-outline: 8px;
 
-  /* 간격 단위 */
-  --spacing-1: 4px;
-  --spacing-2: 8px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-5: 20px;
-  --spacing-6: 24px;
-  --spacing-8: 32px;
-  --spacing-10: 40px;
-  --spacing-12: 48px;
-  --spacing-20: 80px;
+  /* 간격 — DESIGN.md spacing scale */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-52: 52px;
+  --spacing-56: 56px;
+  --spacing-60: 60px;
+  --spacing-80: 80px;
+  --spacing-100: 100px;
+  --spacing-128: 128px;
 }
 
 :root {
@@ -99,11 +108,11 @@
   --muted-foreground: #b3b3b3;
   --accent: #edf6fd;
   --accent-foreground: #292d34;
-  --destructive: #ef4444;
+  --destructive: #514b81;
   --border: #e8e8e8;
   --input: #e8e8e8;
   --ring: #7b68ee;
-  --radius: 0.5625rem; /* 9px */
+  --radius: 0.5625rem;
 
   /* 사이드바 */
   --sidebar: #ffffff;
@@ -121,6 +130,52 @@
   --chart-3: #6647f0;
   --chart-4: #514b81;
   --chart-5: #292d34;
+
+  /* Typography scale — DESIGN.md */
+  --text-caption: 12px;
+  --leading-caption: 1.43;
+  --tracking-caption: -0.14px;
+  --text-body-sm: 14px;
+  --leading-body-sm: 1.43;
+  --tracking-body-sm: -0.15px;
+  --text-body: 16px;
+  --leading-body: 1.5;
+  --tracking-body: -0.26px;
+  --text-subheading: 26px;
+  --leading-subheading: 1.25;
+  --tracking-subheading: -0.91px;
+  --text-heading-sm: 34px;
+  --leading-heading-sm: 1.18;
+  --tracking-heading-sm: -1.19px;
+  --text-heading: 40px;
+  --leading-heading: 1.14;
+  --tracking-heading: -1.6px;
+  --text-heading-lg: 52px;
+  --leading-heading-lg: 1.12;
+  --tracking-heading-lg: -1.82px;
+  --text-display: 76px;
+  --leading-display: 1.05;
+  --tracking-display: -3.8px;
+
+  /* Layout — DESIGN.md */
+  --section-gap: 24px;
+  --card-padding: 12px;
+  --element-gap: 9px;
+
+  /* Shadows — DESIGN.md */
+  --shadow-subtle: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+  --shadow-subtle-2: rgba(18, 43, 165, 0.04) 0px 1px 1px -0.5px,
+    rgba(18, 43, 165, 0.04) 0px 3px 3px -1.5px,
+    rgba(18, 43, 165, 0.04) 0px 6px 6px -3px,
+    rgba(18, 43, 165, 0.04) 0px 12px 12px -6px;
+  --shadow-sm: rgba(13, 21, 48, 0.04) 0px 4px 4px 0px;
+
+  /* Surfaces */
+  --surface-canvas-white: #ffffff;
+  --surface-hint-of-sky: #e9ebf0;
+  --surface-feature-card: #ffffff;
+  --surface-shadow-tint-blue: #edf6fd;
 }
 
 @layer base {
@@ -131,61 +186,243 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-inter);
-    font-size: 14px;
-    line-height: 1.43;
-    letter-spacing: -0.15px;
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body-sm);
+    letter-spacing: var(--tracking-body-sm);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-plus-jakarta-sans);
     font-feature-settings: "calt" 0;
-    color: #090c1d;
+    color: var(--color-deep-space-charcoal);
   }
 
-  h1 { font-size: 40px; line-height: 1.14; letter-spacing: -1.6px; font-weight: 700; }
-  h2 { font-size: 34px; line-height: 1.18; letter-spacing: -1.19px; font-weight: 700; }
-  h3 { font-size: 26px; line-height: 1.25; letter-spacing: -0.91px; font-weight: 650; }
-  h4 { font-size: 16px; line-height: 1.5;  letter-spacing: -0.26px; font-weight: 600; }
+  h1 {
+    font-size: var(--text-heading);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    font-weight: 700;
+  }
+  h2 {
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-heading-sm);
+    letter-spacing: var(--tracking-heading-sm);
+    font-weight: 700;
+  }
+  h3 {
+    font-size: var(--text-subheading);
+    line-height: var(--leading-subheading);
+    letter-spacing: var(--tracking-subheading);
+    font-weight: 600;
+  }
+  h4 {
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    letter-spacing: var(--tracking-body);
+    font-weight: 600;
+  }
 
-  code, pre, time[data-mono] {
+  code,
+  pre,
+  time[data-mono] {
     font-family: var(--font-sometype-mono);
     letter-spacing: 0.06em;
   }
 }
 
 /* ============================================================
-   유틸리티 클래스
+   DESIGN.md 유틸리티 클래스
    ============================================================ */
 
 @layer utilities {
-  /* 카드 그림자 — DESIGN.md Feature Card */
   .shadow-card {
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
-                rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+    box-shadow: var(--shadow-subtle);
   }
 
-  /* hover 인터랙티브 */
   .shadow-hover {
-    box-shadow: rgba(18, 43, 165, 0.04) 0px 1px 1px -0.5px,
-                rgba(18, 43, 165, 0.04) 0px 3px 3px -1.5px,
-                rgba(18, 43, 165, 0.04) 0px 6px 6px -3px,
-                rgba(18, 43, 165, 0.04) 0px 12px 12px -6px;
+    box-shadow: var(--shadow-subtle-2);
   }
 
-  /* 버튼 그림자 */
   .shadow-btn {
-    box-shadow: rgba(13, 21, 48, 0.04) 0px 4px 4px 0px;
+    box-shadow: var(--shadow-sm);
   }
 
-  /* 딥 바이올렛 액센트 텍스트 */
   .text-accent-violet {
-    color: #7b68ee;
+    color: var(--color-deep-violet);
   }
 
-  /* 일렉트릭 블루 액센트 텍스트 */
   .text-accent-blue {
-    color: #0091ff;
+    color: var(--color-electric-blue);
+  }
+
+  /* Feature Card — DESIGN.md */
+  .feature-card {
+    border-radius: var(--radius-cards);
+    border: 1px solid var(--color-ash-gray);
+    background-color: var(--color-canvas-white);
+    padding: var(--card-padding);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  /* Typography utilities */
+  .text-caption {
+    font-size: var(--text-caption);
+    line-height: var(--leading-caption);
+    letter-spacing: var(--tracking-caption);
+  }
+
+  .text-body-sm {
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+  }
+
+  .text-body {
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .text-subheading {
+    font-family: var(--font-plus-jakarta-sans);
+    font-size: var(--text-subheading);
+    line-height: var(--leading-subheading);
+    letter-spacing: var(--tracking-subheading);
+    font-weight: 700;
+    color: var(--color-deep-space-charcoal);
+  }
+
+  .text-page-title {
+    font-family: var(--font-plus-jakarta-sans);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    letter-spacing: var(--tracking-body);
+    font-weight: 600;
+    color: var(--color-deep-space-charcoal);
+  }
+
+  .text-section-title {
+    font-family: var(--font-plus-jakarta-sans);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    font-weight: 600;
+    color: var(--color-deep-space-charcoal);
+  }
+
+  .text-kpi {
+    font-family: var(--font-plus-jakarta-sans);
+    font-size: 20px;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    font-weight: 700;
+    color: var(--color-deep-space-charcoal);
+  }
+
+  /* Form utilities */
+  .form-label {
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    font-weight: 500;
+    color: var(--color-midnight-charcoal);
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-gap);
+  }
+
+  .form-input {
+    height: 36px;
+    font-size: var(--text-body-sm);
+    border-radius: var(--radius-buttons);
+    border-color: var(--color-ash-gray);
+  }
+
+  /* Layout utilities */
+  .p-card {
+    padding: var(--card-padding);
+  }
+
+  .gap-element {
+    gap: var(--element-gap);
+  }
+
+  .gap-section {
+    gap: var(--section-gap);
+  }
+
+  .section-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+  }
+
+  /* Navigation — DESIGN.md hover: Deep Violet + underline */
+  .nav-link {
+    color: var(--color-midnight-charcoal);
+    transition: color 0.15s ease;
+  }
+
+  .nav-link:hover {
+    color: var(--color-deep-violet);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .nav-link-active {
+    background-color: var(--color-shadow-tint-blue);
+    color: var(--color-deep-violet);
+  }
+
+  /* Icon accent container */
+  .icon-accent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-buttons);
+    background-color: var(--color-shadow-tint-blue);
+    color: var(--color-deep-violet);
+  }
+
+  /* Status badge surfaces — brand palette only */
+  .badge-positive {
+    background-color: var(--color-shadow-tint-blue);
+    color: var(--color-deep-violet);
+    border-color: var(--color-ash-gray);
+  }
+
+  .badge-neutral {
+    background-color: var(--color-hint-of-sky);
+    color: var(--color-smoke-gray);
+    border-color: var(--color-ash-gray);
+  }
+
+  .badge-pending {
+    background-color: var(--color-hint-of-sky);
+    color: var(--color-rich-plum);
+    border-color: var(--color-ash-gray);
+  }
+
+  .badge-attention {
+    background-color: var(--color-hint-of-sky);
+    color: var(--color-deep-space-charcoal);
+    border-color: var(--color-vivid-purple);
+    font-weight: 600;
+  }
+
+  .badge-info {
+    background-color: var(--color-shadow-tint-blue);
+    color: var(--color-electric-blue);
+    border-color: var(--color-ash-gray);
   }
 }

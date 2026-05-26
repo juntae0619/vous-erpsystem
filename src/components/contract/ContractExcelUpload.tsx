@@ -418,7 +418,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
                 취소
               </Button>
               <Button
-                className="h-8 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg px-4"
+                className="px-4"
                 disabled={loading || preview?.validCount === 0}
                 onClick={handleImport}
               >
@@ -433,7 +433,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
 
           {step === "result" && (
             <Button
-              className="h-8 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg px-4"
+              className="px-4"
               onClick={onClose}
             >
               닫기

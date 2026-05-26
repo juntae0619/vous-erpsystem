@@ -190,7 +190,7 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 h-9 bg-[#202023] hover:bg-[#292d34] text-white rounded-lg text-[13px]"
+          className="flex-1"
         >
           {isSubmitting ? "저장 중..." : mode === "create" ? "계정 생성" : "저장"}
         </Button>

@@ -72,7 +72,8 @@ export function ApprovalActionPanel({ documentId, canApprove, currentUserRole, i
           </div>
           <div className="flex gap-2">
             <Button
-              className="flex-1 h-9 bg-red-500 hover:bg-red-600 text-white text-[13px] rounded-lg"
+              variant="destructive"
+              className="flex-1"
               onClick={() => submit("REJECTED")}
               disabled={loading}
             >
@@ -103,7 +104,7 @@ export function ApprovalActionPanel({ documentId, canApprove, currentUserRole, i
 
           <div className="flex gap-2 flex-wrap">
             <Button
-              className="flex-1 h-9 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg"
+              className="flex-1"
               onClick={() => submit("APPROVED")}
               disabled={loading}
             >
@@ -123,8 +124,8 @@ export function ApprovalActionPanel({ documentId, canApprove, currentUserRole, i
               </Button>
             )}
             <Button
-              variant="outline"
-              className="flex-1 h-9 text-[13px] border-red-200 text-red-500 hover:bg-red-50 rounded-lg"
+              variant="destructive"
+              className="flex-1"
               onClick={() => setAction("REJECTED")}
               disabled={loading}
             >

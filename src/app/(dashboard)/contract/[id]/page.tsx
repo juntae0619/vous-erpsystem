@@ -11,6 +11,7 @@ import { Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { formatKRW, cn } from "@/lib/utils";
+import { BILLING_CYCLE_MAP } from "@/lib/billing-cycle";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -18,9 +19,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: c?.contractName ?? "계약 상세" };
 }
 
-const BILLING_CYCLE_MAP: Record<string, string> = {
-  QUARTERLY: "분기", SEMI_ANNUAL: "반기", ANNUAL: "연간",
-};
 const FEE_TYPE_MAP: Record<string, string> = { RATE: "수수료율", FIXED: "정액" };
 
 export default async function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -130,7 +128,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
                   </div>
                   {contract.merchantFeeCycle && (
                     <div>
-                      <p className="text-[11px] text-[#b3b3b3]">청구 주기</p>
+                      <p className="text-[11px] text-[#b3b3b3]">가맹점 정산 주기</p>
                       <p className="text-[13px] font-medium text-[#292d34]">
                         {BILLING_CYCLE_MAP[contract.merchantFeeCycle]}
                       </p>

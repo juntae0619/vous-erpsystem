@@ -20,7 +20,7 @@ export async function GET(req: Request) {
   const userId = session!.user.id;
   const role = session!.user.role;
 
-  let where: Prisma.ApprovalDocumentWhereInput = {};
+  const where: Prisma.ApprovalDocumentWhereInput = {};
 
   if (mine) {
     // 내가 제출한 문서

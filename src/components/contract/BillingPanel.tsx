@@ -155,7 +155,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button type="submit" className="h-8 bg-[#202023] text-white text-[12px] rounded-lg px-3" disabled={billingForm.formState.isSubmitting}>
+            <Button type="submit" size="sm" disabled={billingForm.formState.isSubmitting}>
               추가
             </Button>
             <Button type="button" variant="ghost" className="h-8 text-[12px] rounded-lg" onClick={() => { setShowBillingForm(false); billingForm.reset(); }}>
@@ -198,7 +198,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
                   </div>
                   <div>
                     <p className="text-[10px] text-[#b3b3b3]">입금액</p>
-                    <p className="text-[12px] font-medium text-green-600">{formatKRW(billing.paidAmount)}</p>
+                    <p className="text-caption font-medium text-deep-violet">{formatKRW(billing.paidAmount)}</p>
                   </div>
                 </div>
 
@@ -215,7 +215,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
                           {format(new Date(p.paidAt), "MM.dd", { locale: ko })} 입금
                           {p.note && <span className="text-[#b3b3b3] ml-1">({p.note})</span>}
                         </span>
-                        <span className="font-medium text-green-600">+{formatKRW(p.amount)}</span>
+                        <span className="font-medium text-deep-violet">+{formatKRW(p.amount)}</span>
                       </div>
                     ))}
                   </div>
@@ -229,7 +229,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
                       <Input className="h-8 text-[12px] border-[#e8e8e8] rounded-lg" type="number" {...paymentForm.register("amount")} placeholder="금액" />
                     </div>
                     <div className="flex gap-2">
-                      <Button type="submit" className="h-7 bg-[#202023] text-white text-[11px] rounded-lg px-3" disabled={paymentForm.formState.isSubmitting}>
+                      <Button type="submit" size="sm" disabled={paymentForm.formState.isSubmitting}>
                         입금 등록
                       </Button>
                       <Button type="button" variant="ghost" className="h-7 text-[11px] rounded-lg px-2" onClick={() => { setPaymentBillingId(null); paymentForm.reset(); }}>

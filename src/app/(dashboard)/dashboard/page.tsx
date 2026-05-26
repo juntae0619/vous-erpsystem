@@ -114,221 +114,170 @@ export default async function DashboardPage() {
         subtitle={format(today, "yyyy년 M월 d일 (EEE)", { locale: ko })}
       />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        {/* 요약 카드 그리드 */}
+      <div className="flex-1 overflow-y-auto p-6 section-stack">
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {/* 출근 현황 */}
-          <Card className="p-4 shadow-card border-[#e8e8e8] rounded-xl">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#edf6fd]">
-                <Clock size={15} className="text-[#7b68ee]" />
+          <Card>
+            <div className="mb-3 flex items-start justify-between">
+              <div className="icon-accent h-8 w-8">
+                <Clock size={15} />
               </div>
-              <Badge
-                variant="secondary"
-                className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
-                  myAttendance?.checkIn
-                    ? "bg-green-50 text-green-600 border-green-100"
-                    : "bg-[#e9ebf0] text-[#b3b3b3]"
-                }`}
-              >
+              <Badge variant={myAttendance?.checkIn ? "positive" : "neutral"}>
                 {myAttendance?.checkIn ? "출근" : "미출근"}
               </Badge>
             </div>
-            <p className="text-[12px] text-[#b3b3b3] tracking-[-0.14px]">오늘 출근</p>
-            <p
-              className="text-[20px] font-bold text-[#090c1d] mt-0.5 tracking-[-0.5px]"
-              style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-            >
+            <p className="text-caption text-smoke-gray">오늘 출근</p>
+            <p className="text-kpi mt-0.5">
               {myAttendance?.checkIn
                 ? format(myAttendance.checkIn, "HH:mm")
                 : "--:--"}
             </p>
             {myAttendance?.checkOut && (
-              <p className="text-[12px] text-[#b3b3b3] mt-1">
+              <p className="mt-1 text-caption text-smoke-gray">
                 퇴근 {format(myAttendance.checkOut, "HH:mm")}
               </p>
             )}
           </Card>
 
-          {/* 결재 현황 */}
-          <Card className="p-4 shadow-card border-[#e8e8e8] rounded-xl">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#edf6fd]">
-                <FileText size={15} className="text-[#7b68ee]" />
+          <Card>
+            <div className="mb-3 flex items-start justify-between">
+              <div className="icon-accent h-8 w-8">
+                <FileText size={15} />
               </div>
               {pendingApprovals > 0 && (
-                <Badge className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-[#7b68ee] text-white border-0">
-                  {pendingApprovals}건
-                </Badge>
+                <Badge variant="positive">{pendingApprovals}건</Badge>
               )}
             </div>
-            <p className="text-[12px] text-[#b3b3b3] tracking-[-0.14px]">
+            <p className="text-caption text-smoke-gray">
               {isManager ? "처리 대기" : "진행 중 결재"}
             </p>
-            <p
-              className="text-[20px] font-bold text-[#090c1d] mt-0.5 tracking-[-0.5px]"
-              style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-            >
-              {pendingApprovals}건
-            </p>
+            <p className="text-kpi mt-0.5">{pendingApprovals}건</p>
           </Card>
 
-          {/* 휴가 대기 / 오늘 휴가 */}
-          <Card className="p-4 shadow-card border-[#e8e8e8] rounded-xl">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#edf6fd]">
-                <CalendarDays size={15} className="text-[#7b68ee]" />
+          <Card>
+            <div className="mb-3 flex items-start justify-between">
+              <div className="icon-accent h-8 w-8">
+                <CalendarDays size={15} />
               </div>
             </div>
-            <p className="text-[12px] text-[#b3b3b3] tracking-[-0.14px]">오늘 휴가 인원</p>
-            <p
-              className="text-[20px] font-bold text-[#090c1d] mt-0.5 tracking-[-0.5px]"
-              style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-            >
-              {onLeaveToday}명
-            </p>
+            <p className="text-caption text-smoke-gray">오늘 휴가 인원</p>
+            <p className="text-kpi mt-0.5">{onLeaveToday}명</p>
             {myPendingLeaves > 0 && (
-              <p className="text-[12px] text-[#b3b3b3] mt-1">
+              <p className="mt-1 text-caption text-smoke-gray">
                 내 신청 대기 {myPendingLeaves}건
               </p>
             )}
           </Card>
 
-          {/* 연체 / 수금 현황 (관리자) */}
           {isManager ? (
-            <Card className="p-4 shadow-card border-[#e8e8e8] rounded-xl">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#edf6fd]">
-                  <AlertCircle size={15} className={overdueCount > 0 ? "text-red-500" : "text-[#7b68ee]"} />
+            <Card>
+              <div className="mb-3 flex items-start justify-between">
+                <div className="icon-accent h-8 w-8">
+                  <AlertCircle size={15} className={overdueCount > 0 ? "text-rich-plum" : ""} />
                 </div>
                 {overdueCount > 0 && (
-                  <Badge className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-red-500 text-white border-0">
-                    연체 {overdueCount}건
-                  </Badge>
+                  <Badge variant="attention">연체 {overdueCount}건</Badge>
                 )}
               </div>
-              <p className="text-[12px] text-[#b3b3b3] tracking-[-0.14px]">이번 달 미수금</p>
-              <p
-                className="text-[20px] font-bold text-[#090c1d] mt-0.5 tracking-[-0.5px]"
-                style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-              >
+              <p className="text-caption text-smoke-gray">이번 달 미수금</p>
+              <p className="text-kpi mt-0.5">
                 {unpaidBilling > 0
                   ? `${(unpaidBilling / 10000).toFixed(0)}만원`
                   : "없음"}
               </p>
             </Card>
           ) : (
-            <Card className="p-4 shadow-card border-[#e8e8e8] rounded-xl">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#edf6fd]">
-                  <TrendingUp size={15} className="text-[#7b68ee]" />
+            <Card>
+              <div className="mb-3 flex items-start justify-between">
+                <div className="icon-accent h-8 w-8">
+                  <TrendingUp size={15} />
                 </div>
               </div>
-              <p className="text-[12px] text-[#b3b3b3] tracking-[-0.14px]">내 팀</p>
-              <p
-                className="text-[20px] font-bold text-[#090c1d] mt-0.5 tracking-[-0.5px]"
-                style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-              >
-                바우처팀
-              </p>
+              <p className="text-caption text-smoke-gray">내 팀</p>
+              <p className="text-kpi mt-0.5">바우처팀</p>
             </Card>
           )}
         </div>
 
-        {/* 수금 현황 (관리자) */}
         {isManager && totalBilling > 0 && (
-          <Card className="p-5 shadow-card border-[#e8e8e8] rounded-xl">
-            <h3
-              className="text-[14px] font-semibold text-[#090c1d] mb-4 tracking-[-0.15px]"
-              style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-            >
-              이번 달 수금 현황
-            </h3>
-            <div className="flex items-center gap-6 mb-3">
+          <Card>
+            <h3 className="mb-4 font-heading text-section-title">이번 달 수금 현황</h3>
+            <div className="mb-3 flex items-center gap-6">
               <div>
-                <p className="text-[12px] text-[#b3b3b3]">총 청구액</p>
-                <p className="text-[16px] font-semibold text-[#090c1d]">
+                <p className="text-caption text-smoke-gray">총 청구액</p>
+                <p className="text-body font-semibold text-deep-space-charcoal">
                   {(totalBilling / 10000).toFixed(0)}만원
                 </p>
               </div>
               <div>
-                <p className="text-[12px] text-[#b3b3b3]">입금 완료</p>
-                <p className="text-[16px] font-semibold text-green-600">
+                <p className="text-caption text-smoke-gray">입금 완료</p>
+                <p className="text-body font-semibold text-deep-violet">
                   {(paidBilling / 10000).toFixed(0)}만원
                 </p>
               </div>
               <div>
-                <p className="text-[12px] text-[#b3b3b3]">미수금</p>
-                <p className="text-[16px] font-semibold text-red-500">
+                <p className="text-caption text-smoke-gray">미수금</p>
+                <p className="text-body font-semibold text-rich-plum">
                   {(unpaidBilling / 10000).toFixed(0)}만원
                 </p>
               </div>
             </div>
-            {/* 프로그레스 바 */}
-            <div className="w-full bg-[#e9ebf0] rounded-full h-2">
+            <div className="h-2 w-full rounded-full bg-hint-of-sky">
               <div
-                className="bg-[#7b68ee] h-2 rounded-full transition-all"
+                className="h-2 rounded-full bg-deep-violet transition-all"
                 style={{ width: totalBilling > 0 ? `${(paidBilling / totalBilling) * 100}%` : "0%" }}
               />
             </div>
-            <p className="text-[11px] text-[#b3b3b3] mt-1.5">
+            <p className="mt-1.5 text-caption text-smoke-gray">
               수금률 {totalBilling > 0 ? Math.round((paidBilling / totalBilling) * 100) : 0}%
             </p>
           </Card>
         )}
 
-        {/* 빈 상태 안내 */}
         {totalBilling === 0 && isManager && (
-          <Card className="p-8 shadow-card border-[#e8e8e8] rounded-xl text-center">
-            <Building2 size={28} className="mx-auto text-[#e8e8e8] mb-3" />
-            <p className="text-[14px] font-medium text-[#b3b3b3]">
+          <Card className="py-8 text-center">
+            <Building2 size={28} className="mx-auto mb-3 text-ash-gray" />
+            <p className="text-body-sm font-medium text-smoke-gray">
               이번 달 청구 내역이 없습니다
             </p>
-            <p className="text-[12px] text-[#b3b3b3] mt-1">
+            <p className="mt-1 text-caption text-smoke-gray">
               계약·수금 관리에서 청구 내역을 등록해주세요
             </p>
           </Card>
         )}
 
-        {/* 최근 활동 피드 */}
         {recentActivity.length > 0 && (
-          <Card className="p-5 shadow-card border-[#e8e8e8] rounded-xl">
-            <div className="flex items-center gap-2 mb-4">
-              <Activity size={14} className="text-[#7b68ee]" />
-              <h3
-                className="text-[14px] font-semibold text-[#090c1d] tracking-[-0.15px]"
-                style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-              >
-                내 최근 활동
-              </h3>
+          <Card>
+            <div className="mb-4 flex items-center gap-2">
+              <Activity size={14} className="text-deep-violet" />
+              <h3 className="font-heading text-section-title">내 최근 활동</h3>
             </div>
             <div className="space-y-2.5">
               {recentActivity.map((log) => {
                 const ACTION_MAP: Record<string, { label: string; color: string; href?: string }> = {
-                  CONTRACT_CREATED: { label: "계약 등록", color: "text-green-600", href: "/contract" },
-                  LEAVE_APPROVED: { label: "휴가 승인", color: "text-[#7b68ee]", href: "/leave" },
-                  LEAVE_REJECTED: { label: "휴가 반려", color: "text-red-500", href: "/leave" },
-                  APPROVAL_APPROVED: { label: "결재 승인", color: "text-[#7b68ee]", href: "/approval" },
-                  APPROVAL_REJECTED: { label: "결재 반려", color: "text-red-500", href: "/approval" },
-                  APPROVAL_APPROVED_FINAL: { label: "전결 처리", color: "text-[#7b68ee]", href: "/approval" },
+                  CONTRACT_CREATED: { label: "계약 등록", color: "text-deep-violet", href: "/contract" },
+                  LEAVE_APPROVED: { label: "휴가 승인", color: "text-deep-violet", href: "/leave" },
+                  LEAVE_REJECTED: { label: "휴가 반려", color: "text-rich-plum", href: "/leave" },
+                  APPROVAL_APPROVED: { label: "결재 승인", color: "text-deep-violet", href: "/approval" },
+                  APPROVAL_REJECTED: { label: "결재 반려", color: "text-rich-plum", href: "/approval" },
+                  APPROVAL_APPROVED_FINAL: { label: "전결 처리", color: "text-deep-violet", href: "/approval" },
                 };
-                const info = ACTION_MAP[log.action] ?? { label: log.action, color: "text-[#b3b3b3]" };
+                const info = ACTION_MAP[log.action] ?? { label: log.action, color: "text-smoke-gray" };
                 const details = log.details as Record<string, unknown> | null;
                 const detailText =
                   details?.contractName ?? details?.title ?? details?.type ?? "";
 
                 return (
                   <div key={log.id} className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#e8e8e8] shrink-0" />
-                    <div className="flex-1 min-w-0 flex items-center gap-2">
-                      <span className={`text-[12px] font-medium shrink-0 ${info.color}`}>
+                    <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-ash-gray" />
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                      <span className={`shrink-0 text-caption font-medium ${info.color}`}>
                         {info.label}
                       </span>
                       {detailText && (
-                        <span className="text-[12px] text-[#292d34] truncate">{String(detailText)}</span>
+                        <span className="truncate text-caption text-midnight-charcoal">{String(detailText)}</span>
                       )}
                     </div>
-                    <span className="text-[11px] text-[#d0d0d0] shrink-0">
+                    <span className="shrink-0 text-caption text-smoke-gray">
                       {formatDistanceToNow(log.createdAt, { addSuffix: true, locale: ko })}
                     </span>
                   </div>

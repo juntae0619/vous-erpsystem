@@ -74,7 +74,7 @@ export default async function AuditPage({
               href="/admin/audit"
               className={`text-[12px] px-3 py-1.5 rounded-lg transition-colors ${
                 !resource
-                  ? "bg-[#202023] text-white"
+                  ? "bg-primary text-primary-foreground"
                   : "bg-[#e9ebf0] text-[#292d34] hover:bg-[#d9dce3]"
               }`}
             >
@@ -86,7 +86,7 @@ export default async function AuditPage({
                 href={`/admin/audit?resource=${r.resource}`}
                 className={`text-[12px] px-3 py-1.5 rounded-lg transition-colors ${
                   resource === r.resource
-                    ? "bg-[#202023] text-white"
+                    ? "bg-primary text-primary-foreground"
                     : "bg-[#e9ebf0] text-[#292d34] hover:bg-[#d9dce3]"
                 }`}
               >
@@ -155,7 +155,7 @@ export default async function AuditPage({
                   href={`/admin/audit?page=${p}${resource ? `&resource=${resource}` : ""}`}
                   className={`w-8 h-8 flex items-center justify-center text-[12px] rounded-lg transition-colors ${
                     p === page
-                      ? "bg-[#202023] text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "bg-[#e9ebf0] text-[#292d34] hover:bg-[#d9dce3]"
                   }`}
                 >

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -56,15 +55,17 @@ export function UserActionButtons({ userId, isActive }: UserActionButtonsProps) 
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="w-7 h-7 rounded-lg hover:bg-[#e9ebf0] text-[#b3b3b3]"
-          disabled={loading}
-        >
-          <MoreHorizontal size={14} />
-        </Button>
+      <DropdownMenuTrigger
+        disabled={loading}
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 rounded-lg text-[#b3b3b3] hover:bg-[#e9ebf0]"
+          />
+        }
+      >
+        <MoreHorizontal size={14} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44 rounded-xl border-[#e8e8e8] shadow-card">
         <DropdownMenuItem

@@ -20,9 +20,9 @@ export function ContractPageActions({ exportHref }: Props) {
       <div className="flex items-center gap-2">
         <ExportButton href={exportHref} label="Excel" />
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="h-8 text-[12px] border border-[#e8e8e8] rounded-lg px-3 gap-1.5 hover:bg-[#f0eeff] hover:border-[#c4bdff] text-[#292d34]"
+          className="gap-1.5"
           onClick={() => setShowUpload(true)}
         >
           <Upload size={13} />
@@ -30,10 +30,7 @@ export function ContractPageActions({ exportHref }: Props) {
         </Button>
         <Link
           href="/contract/new"
-          className={cn(
-            buttonVariants(),
-            "h-8 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg px-3 gap-1.5"
-          )}
+          className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
         >
           <Plus size={13} />
           계약 등록

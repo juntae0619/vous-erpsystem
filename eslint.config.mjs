@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Legacy duplicate app folder & generated output
+    "erp-system/**",
+    "src/generated/**",
   ]),
 ]);
 

@@ -1,5 +1,6 @@
 import { ok, fail, requireAuth, requireManager } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
+import { billingCycleSchema, merchantSettlementCycleSchema } from "@/lib/billing-cycle";
 import { z } from "zod/v4";
 
 // GET /api/contract/[id]
@@ -34,14 +35,14 @@ const updateSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   serviceAmount: z.number().min(0).optional(),
-  billingCycle: z.enum(["QUARTERLY", "SEMI_ANNUAL", "ANNUAL"]).optional(),
+  billingCycle: billingCycleSchema.optional(),
   assigneeId: z.string().optional(),
   status: z.enum(["ACTIVE", "ENDED", "RENEWAL_PENDING"]).optional(),
   hasMerchantFee: z.boolean().optional(),
   merchantFeeType: z.enum(["RATE", "FIXED"]).optional().nullable(),
   merchantFeeRate: z.number().optional().nullable(),
   merchantFeeAmount: z.number().optional().nullable(),
-  merchantFeeCycle: z.enum(["QUARTERLY", "SEMI_ANNUAL", "ANNUAL"]).optional().nullable(),
+  merchantFeeCycle: merchantSettlementCycleSchema.optional().nullable(),
   note: z.string().optional(),
 });
 

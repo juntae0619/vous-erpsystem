@@ -1,4 +1,5 @@
 import { requireManager } from "@/lib/api";
+import { BILLING_CYCLE_IMPORT_LABELS, MERCHANT_SETTLEMENT_IMPORT_LABELS } from "@/lib/billing-cycle";
 import * as XLSX from "xlsx";
 
 // GET /api/contract/template — 계약 일괄등록용 Excel 템플릿 다운로드
@@ -14,13 +15,13 @@ export async function GET(req: Request) {
     "계약시작일",     // D  *필수  YYYY-MM-DD
     "계약종료일",     // E  *필수  YYYY-MM-DD
     "서비스금액(원)", // F  *필수  숫자
-    "청구주기",       // G  *필수  분기|반기|연간
+    "청구주기",       // G  *필수  10일|15일|한달|분기|반기|연간
     "담당자명",       // H  *필수  사용자 이름과 정확히 일치
     "가맹점수수료",   // I  선택   Y|N  (기본 N)
     "수수료유형",     // J  선택   수수료율|정액
     "수수료율(%)",    // K  선택   숫자 (수수료유형=수수료율 일 때)
     "수수료금액(원)", // L  선택   숫자 (수수료유형=정액 일 때)
-    "수수료청구주기", // M  선택   분기|반기|연간
+    "가맹점정산주기", // M  선택   10일|15일|한달
     "비고",           // N  선택
   ];
 
@@ -75,13 +76,13 @@ export async function GET(req: Request) {
     ["계약시작일", "✓", "YYYY-MM-DD"],
     ["계약종료일", "✓", "YYYY-MM-DD"],
     ["서비스금액(원)", "✓", "0 이상 정수"],
-    ["청구주기", "✓", "분기 / 반기 / 연간"],
+    ["청구주기", "✓", BILLING_CYCLE_IMPORT_LABELS.replace(/\|/g, " / ")],
     ["담당자명", "✓", "시스템 등록 사용자명과 정확히 일치"],
     ["가맹점수수료", "", "Y / N (생략 시 N)"],
     ["수수료유형", "", "수수료율 / 정액 (가맹점수수료=Y 일 때만)"],
     ["수수료율(%)", "", "소수 허용 (수수료유형=수수료율 일 때)"],
     ["수수료금액(원)", "", "정수 (수수료유형=정액 일 때)"],
-    ["수수료청구주기", "", "분기 / 반기 / 연간"],
+    ["가맹점정산주기", "", MERCHANT_SETTLEMENT_IMPORT_LABELS.replace(/\|/g, " / ")],
     ["비고", "", "자유 입력"],
   ];
   const wsGuide = XLSX.utils.aoa_to_sheet(guideData);

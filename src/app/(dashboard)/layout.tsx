@@ -9,7 +9,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user?.id) redirect("/login");
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   });
 
   return (
-    <div className="flex h-screen bg-[#e9ebf0] overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-hint-of-sky">
       <Sidebar
         userRole={user?.role ?? session.user.role}
         userName={user?.name ?? session.user.name ?? ""}

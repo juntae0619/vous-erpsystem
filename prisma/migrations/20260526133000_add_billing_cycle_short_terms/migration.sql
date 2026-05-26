@@ -1,0 +1,4 @@
+-- AlterEnum
+ALTER TYPE "BillingCycle" ADD VALUE 'DAYS_10';
+ALTER TYPE "BillingCycle" ADD VALUE 'DAYS_15';
+ALTER TYPE "BillingCycle" ADD VALUE 'MONTHLY';

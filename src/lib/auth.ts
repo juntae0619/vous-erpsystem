@@ -26,7 +26,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string;
+        // token.sub는 NextAuth v5가 user.id로 자동 설정 — token.id가 없는 기존 세션 대비 fallback
+        session.user.id = (token.id ?? token.sub) as string;
         session.user.role = token.role as string;
       }
       return session;

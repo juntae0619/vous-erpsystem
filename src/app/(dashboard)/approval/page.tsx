@@ -60,7 +60,7 @@ export default async function ApprovalPage() {
   const newDocBtn = (
     <Link
       href="/approval/new"
-      className={cn(buttonVariants(), "h-8 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg px-3 gap-1.5")}
+      className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
     >
       <Plus size={13} />
       문서 작성

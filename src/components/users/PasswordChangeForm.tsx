@@ -81,7 +81,7 @@ export function PasswordChangeForm() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-9 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg"
+          className="w-full"
         >
           {isSubmitting ? "변경 중..." : "비밀번호 변경"}
         </Button>

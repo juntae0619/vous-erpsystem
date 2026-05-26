@@ -2,7 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout/Header";
-import { ContractForm } from "@/components/contract/ContractForm";
+import { ContractForm, type ContractFormData } from "@/components/contract/ContractForm";
+import { toMerchantSettlementCycle, type MerchantSettlementCycleValue } from "@/lib/billing-cycle";
 import { format } from "date-fns";
 
 export const metadata = { title: "계약 수정" };
@@ -22,7 +23,10 @@ export default async function EditContractPage({ params }: { params: Promise<{ i
     orderBy: { name: "asc" },
   });
 
-  const defaultValues = {
+  const merchantFeeCycle: MerchantSettlementCycleValue | undefined =
+    toMerchantSettlementCycle(contract.merchantFeeCycle);
+
+  const defaultValues: Partial<ContractFormData> = {
     localGovName: contract.localGovName,
     contractNumber: contract.contractNumber,
     contractName: contract.contractName,
@@ -35,7 +39,7 @@ export default async function EditContractPage({ params }: { params: Promise<{ i
     merchantFeeType: contract.merchantFeeType ?? undefined,
     merchantFeeRate: contract.merchantFeeRate ? String(Number(contract.merchantFeeRate)) : undefined,
     merchantFeeAmount: contract.merchantFeeAmount ? String(Number(contract.merchantFeeAmount)) : undefined,
-    merchantFeeCycle: contract.merchantFeeCycle ?? undefined,
+    merchantFeeCycle,
     note: contract.note ?? undefined,
   };
 

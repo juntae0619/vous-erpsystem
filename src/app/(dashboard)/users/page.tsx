@@ -36,7 +36,7 @@ export default async function UsersPage() {
           {/* 상단 버튼 */}
           <div className="flex justify-end">
             <Link href="/users/new">
-              <Button className="h-9 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg gap-2">
+              <Button className="gap-2">
                 <UserPlus size={14} />
                 새 계정 생성
               </Button>

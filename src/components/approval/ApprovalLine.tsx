@@ -23,10 +23,10 @@ const ROLE_MAP: Record<string, string> = {
 };
 
 const STEP_CONFIG: Record<StepStatus, { icon: React.ReactNode; color: string; bg: string }> = {
-  PENDING:  { icon: <Clock size={13} />,        color: "text-[#b3b3b3]", bg: "bg-[#f8f9fb]" },
-  APPROVED: { icon: <Check size={13} />,         color: "text-green-600", bg: "bg-[#f0fdf4]" },
-  REJECTED: { icon: <X size={13} />,             color: "text-red-600",   bg: "bg-[#fef2f2]" },
-  SKIPPED:  { icon: <SkipForward size={13} />,   color: "text-[#b3b3b3]", bg: "bg-[#f8f9fb]" },
+  PENDING:  { icon: <Clock size={13} />,        color: "text-smoke-gray", bg: "bg-hint-of-sky" },
+  APPROVED: { icon: <Check size={13} />,         color: "text-deep-violet", bg: "bg-shadow-tint-blue" },
+  REJECTED: { icon: <X size={13} />,             color: "text-rich-plum",   bg: "bg-hint-of-sky" },
+  SKIPPED:  { icon: <SkipForward size={13} />,   color: "text-smoke-gray", bg: "bg-hint-of-sky" },
 };
 
 export function ApprovalLine({ steps }: Props) {

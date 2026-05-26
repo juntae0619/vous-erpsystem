@@ -11,7 +11,6 @@ import { ko } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,14 +27,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-
-const LEAVE_TYPE_OPTIONS = [
-  { value: "ANNUAL",   label: "연차" },
-  { value: "HALF_DAY", label: "반차" },
-  { value: "SICK",     label: "병가" },
-  { value: "PUBLIC",   label: "공가" },
-  { value: "SPECIAL",  label: "경조사" },
-] as const;
+import {
+  LEAVE_TYPE_OPTIONS,
+  leaveTypeSchema,
+  type LeaveTypeValue,
+} from "@/lib/leave-types";
 
 const HALF_DAY_OPTIONS = [
   { value: "AM", label: "오전 반차" },
@@ -43,14 +39,11 @@ const HALF_DAY_OPTIONS = [
 ] as const;
 
 const schema = z.object({
-  type: z.enum(["ANNUAL", "HALF_DAY", "SICK", "PUBLIC", "SPECIAL"]),
+  type: leaveTypeSchema,
   halfDayType: z.enum(["AM", "PM"]).optional(),
   reason: z.string().min(2, "사유를 입력해주세요"),
 });
 type FormData = z.infer<typeof schema>;
-
-const LABEL_CLS = "text-[13px] font-medium text-[#292d34]";
-const INPUT_CLS = "h-9 text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
 
 export function LeaveRequestForm() {
   const router = useRouter();
@@ -83,47 +76,52 @@ export function LeaveRequestForm() {
 
     const effectiveEnd = isHalfDay ? startDate : endDate!;
 
-    const res = await fetch("/api/leave/requests", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...data,
-        startDate: format(startDate, "yyyy-MM-dd"),
-        endDate: format(effectiveEnd, "yyyy-MM-dd"),
-      }),
-    });
-    const json = await res.json();
-    if (!res.ok) { toast.error(json.error ?? "신청에 실패했습니다"); return; }
-    toast.success("휴가 신청이 완료되었습니다");
-    reset();
-    setStartDate(undefined);
-    setEndDate(undefined);
-    router.refresh();
+    try {
+      const res = await fetch("/api/leave/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          startDate: format(startDate, "yyyy-MM-dd"),
+          endDate: format(effectiveEnd, "yyyy-MM-dd"),
+        }),
+      });
+
+      const json = await res.json().catch(() => null);
+      if (!res.ok) {
+        toast.error(json?.error ?? "신청에 실패했습니다");
+        return;
+      }
+
+      toast.success("휴가 신청이 완료되었습니다");
+      reset();
+      setStartDate(undefined);
+      setEndDate(undefined);
+      router.refresh();
+    } catch {
+      toast.error("신청 중 오류가 발생했습니다");
+    }
   };
 
   return (
-    <Card className="p-5 shadow-card border-[#e8e8e8] rounded-xl">
-      <h3
-        className="text-[15px] font-semibold text-[#090c1d] mb-4"
-        style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-      >
-        휴가 신청
-      </h3>
+    <Card className="gap-4">
+      <h3 className="font-heading text-section-title">휴가 신청</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* 휴가 종류 */}
-        <div className="space-y-1.5">
-          <Label className={LABEL_CLS}>휴가 종류</Label>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <div className="form-field">
+          <Label>휴가 종류</Label>
           <Select
             value={leaveType}
-            onValueChange={(v) => setValue("type", v as FormData["type"])}
+            onValueChange={(v) => setValue("type", v as LeaveTypeValue)}
           >
-            <SelectTrigger className={INPUT_CLS}>
-              <SelectValue />
+            <SelectTrigger className="form-input h-9 w-full justify-between rounded-[var(--radius-buttons)] border-border bg-canvas-white text-body-sm">
+              <SelectValue placeholder="휴가 종류 선택">
+                {LEAVE_TYPE_OPTIONS.find((o) => o.value === leaveType)?.label}
+              </SelectValue>
             </SelectTrigger>
-            <SelectContent className="rounded-xl border-[#e8e8e8]">
+            <SelectContent className="rounded-xl border-border">
               {LEAVE_TYPE_OPTIONS.map((o) => (
-                <SelectItem key={o.value} value={o.value} className="text-[13px]">
+                <SelectItem key={o.value} value={o.value} className="text-body-sm">
                   {o.label}
                 </SelectItem>
               ))}
@@ -131,19 +129,16 @@ export function LeaveRequestForm() {
           </Select>
         </div>
 
-        {/* 반차 구분 */}
         {isHalfDay && (
-          <div className="space-y-1.5">
-            <Label className={LABEL_CLS}>반차 구분</Label>
-            <Select
-              onValueChange={(v) => setValue("halfDayType", v as "AM" | "PM")}
-            >
-              <SelectTrigger className={INPUT_CLS}>
+          <div className="form-field">
+            <Label>반차 구분</Label>
+            <Select onValueChange={(v) => setValue("halfDayType", v as "AM" | "PM")}>
+              <SelectTrigger className="form-input h-9 w-full justify-between rounded-[var(--radius-buttons)] border-border bg-canvas-white text-body-sm">
                 <SelectValue placeholder="오전/오후 선택" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-[#e8e8e8]">
+              <SelectContent className="rounded-xl border-border">
                 {HALF_DAY_OPTIONS.map((o) => (
-                  <SelectItem key={o.value} value={o.value} className="text-[13px]">
+                  <SelectItem key={o.value} value={o.value} className="text-body-sm">
                     {o.label}
                   </SelectItem>
                 ))}
@@ -152,18 +147,18 @@ export function LeaveRequestForm() {
           </div>
         )}
 
-        {/* 날짜 */}
         <div className={`grid gap-3 ${isHalfDay ? "grid-cols-1" : "grid-cols-2"}`}>
-          <div className="space-y-1.5">
-            <Label className={LABEL_CLS}>{isHalfDay ? "날짜" : "시작일"}</Label>
+          <div className="form-field">
+            <Label>{isHalfDay ? "날짜" : "시작일"}</Label>
             <Popover open={startOpen} onOpenChange={setStartOpen}>
               <PopoverTrigger
-                className={`${INPUT_CLS} w-full flex items-center justify-start font-normal bg-white border border-[#e8e8e8] ${!startDate ? "text-[#b3b3b3]" : "text-[#292d34]"}`}
+                className="form-input flex w-full items-center justify-start border bg-canvas-white font-normal data-[empty=true]:text-smoke-gray"
+                data-empty={!startDate}
               >
-                <CalendarIcon size={13} className="mr-2 text-[#b3b3b3]" />
+                <CalendarIcon size={13} className="mr-2 shrink-0 text-smoke-gray" />
                 {startDate ? format(startDate, "yyyy.MM.dd", { locale: ko }) : "날짜 선택"}
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 rounded-xl border-[#e8e8e8] shadow-card" align="start">
+              <PopoverContent className="w-auto rounded-xl border-border bg-canvas-white p-0 shadow-card" align="start">
                 <Calendar
                   mode="single"
                   selected={startDate}
@@ -175,16 +170,17 @@ export function LeaveRequestForm() {
           </div>
 
           {!isHalfDay && (
-            <div className="space-y-1.5">
-              <Label className={LABEL_CLS}>종료일</Label>
+            <div className="form-field">
+              <Label>종료일</Label>
               <Popover open={endOpen} onOpenChange={setEndOpen}>
                 <PopoverTrigger
-                  className={`${INPUT_CLS} w-full flex items-center justify-start font-normal bg-white border border-[#e8e8e8] ${!endDate ? "text-[#b3b3b3]" : "text-[#292d34]"}`}
+                  className="form-input flex w-full items-center justify-start border bg-canvas-white font-normal data-[empty=true]:text-smoke-gray"
+                  data-empty={!endDate}
                 >
-                  <CalendarIcon size={13} className="mr-2 text-[#b3b3b3]" />
+                  <CalendarIcon size={13} className="mr-2 shrink-0 text-smoke-gray" />
                   {endDate ? format(endDate, "yyyy.MM.dd", { locale: ko }) : "날짜 선택"}
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 rounded-xl border-[#e8e8e8] shadow-card" align="start">
+                <PopoverContent className="w-auto rounded-xl border-border bg-canvas-white p-0 shadow-card" align="start">
                   <Calendar
                     mode="single"
                     selected={endDate}
@@ -197,24 +193,19 @@ export function LeaveRequestForm() {
           )}
         </div>
 
-        {/* 사유 */}
-        <div className="space-y-1.5">
-          <Label className={LABEL_CLS}>사유</Label>
+        <div className="form-field">
+          <Label>사유</Label>
           <Textarea
             {...register("reason")}
             placeholder="휴가 사유를 입력해주세요"
-            className="text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[80px]"
+            className="min-h-[80px] resize-none rounded-[var(--radius-buttons)] border-border text-body-sm focus-visible:ring-ring"
           />
           {errors.reason && (
-            <p className="text-[12px] text-destructive">{errors.reason.message}</p>
+            <p className="text-caption text-destructive">{errors.reason.message}</p>
           )}
         </div>
 
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full h-9 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg"
-        >
+        <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? "신청 중..." : "휴가 신청"}
         </Button>
       </form>

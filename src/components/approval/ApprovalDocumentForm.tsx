@@ -278,7 +278,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
         </Button>
         <Button
           type="button"
-          className="flex-1 h-9 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] rounded-lg"
+          className="flex-1"
           disabled={submitting}
           onClick={handleSubmit((data) => submit(data, false))}
         >

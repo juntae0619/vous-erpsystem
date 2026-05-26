@@ -2,6 +2,8 @@ import { ok, fail, requireAuth, requireManager } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 import { createNotification } from "@/lib/notify";
 import { writeAuditLog } from "@/lib/audit";
+import { calculateAnnualLeaveDays } from "@/lib/leave";
+import { LEAVE_TYPE_LABELS } from "@/lib/leave-types";
 import { z } from "zod/v4";
 
 // GET /api/leave/requests/[id]
@@ -76,6 +78,14 @@ export async function PUT(
 
     if (action === "APPROVED" && (request.type === "ANNUAL" || request.type === "HALF_DAY")) {
       const year = request.startDate.getFullYear();
+      const user = await tx.user.findUnique({
+        where: { id: request.userId },
+        select: { joinedAt: true },
+      });
+      const totalDays = user
+        ? calculateAnnualLeaveDays(user.joinedAt, year)
+        : 0;
+
       await tx.leaveBalance.upsert({
         where: { userId_year: { userId: request.userId, year } },
         update: {
@@ -85,7 +95,7 @@ export async function PUT(
         create: {
           userId: request.userId,
           year,
-          totalDays: 15,
+          totalDays,
           usedDays: Number(request.days),
           usedHalfDays: request.type === "HALF_DAY" ? 1 : 0,
         },
@@ -105,10 +115,7 @@ export async function PUT(
   });
 
   // 알림 전송 (트랜잭션 외부 — 실패해도 OK)
-  const leaveTypeLabel: Record<string, string> = {
-    ANNUAL: "연차", HALF_DAY: "반차", SICK: "병가", SPECIAL: "특별휴가", UNPAID: "무급휴가",
-  };
-  const typeLabel = leaveTypeLabel[request.type] ?? "휴가";
+  const typeLabel = LEAVE_TYPE_LABELS[request.type as keyof typeof LEAVE_TYPE_LABELS] ?? "휴가";
   await createNotification({
     userId: request.userId,
     type: action === "APPROVED" ? "LEAVE_APPROVED" : "LEAVE_REJECTED",

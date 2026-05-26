@@ -134,7 +134,7 @@ export function CheckInOutButton({ initialRecord, onUpdate }: CheckInOutButtonPr
         <Button
           onClick={handleCheckIn}
           disabled={loading || !!record?.checkIn}
-          className="flex-1 h-10 bg-[#202023] hover:bg-[#292d34] text-white text-[13px] font-medium rounded-lg gap-2 disabled:opacity-40"
+          className="flex-1 gap-2 disabled:opacity-40"
         >
           <LogIn size={14} />
           출근

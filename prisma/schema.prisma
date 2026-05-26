@@ -37,6 +37,7 @@ enum LeaveType {
   SICK      // 병가
   PUBLIC    // 공가
   SPECIAL   // 경조사
+  SUMMER    // 여름휴가
 }
 
 enum HalfDayType {
@@ -79,6 +80,9 @@ enum ApprovalStepStatus {
 }
 
 enum BillingCycle {
+  DAYS_10      // 10일
+  DAYS_15      // 15일
+  MONTHLY      // 한달
   QUARTERLY    // 분기
   SEMI_ANNUAL  // 반기
   ANNUAL       // 연
@@ -109,8 +113,8 @@ enum PaymentStatus {
 }
 
 enum DisbursementType {
-  MERCHANT_PAYMENT  // 가맹점 대금
-  OTHER             // 기타
+  ALREADY_PAID  // 기지급
+  SCHEDULED     // 지급예정
 }
 
 enum NotificationType {
@@ -342,18 +346,21 @@ model Payment {
 }
 
 model Disbursement {
-  id            String           @id @default(cuid())
-  assigneeId    String
-  vendorName    String
-  itemType      DisbursementType
-  description   String
-  amount        Decimal          @db.Decimal(15, 0)
-  scheduledDate DateTime         @db.Date
-  paidDate      DateTime?        @db.Date
-  isPaid        Boolean          @default(false)
-  note          String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  id               String           @id @default(cuid())
+  assigneeId       String
+  vendorName       String
+  itemType         DisbursementType
+  description      String
+  amount           Decimal          @db.Decimal(15, 0)
+  scheduledDate    DateTime         @db.Date
+  paidDate         DateTime?        @db.Date
+  isPaid           Boolean          @default(false)
+  taxInvoiceStatus TaxInvoiceStatus @default(NOT_ISSUED)
+  taxInvoiceNumber String?
+  taxInvoiceDate   DateTime?        @db.Date
+  note             String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   assignee User @relation(fields: [assigneeId], references: [id])
 

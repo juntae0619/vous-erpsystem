@@ -1,14 +1,17 @@
 import { ok, fail, requireManager } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 import { writeAuditLog } from "@/lib/audit";
+import {
+  BILLING_CYCLE_IMPORT_LABELS,
+  BILLING_CYCLE_IMPORT_MAP,
+  MERCHANT_SETTLEMENT_IMPORT_LABELS,
+  MERCHANT_SETTLEMENT_IMPORT_MAP,
+  billingCycleSchema,
+  merchantSettlementCycleSchema,
+} from "@/lib/billing-cycle";
 import { z } from "zod/v4";
 
-/* ── 청구주기·수수료유형 매핑 ─────────────────────────────── */
-const CYCLE_MAP: Record<string, string> = {
-  분기: "QUARTERLY",
-  반기: "SEMI_ANNUAL",
-  연간: "ANNUAL",
-};
+/* ── 수수료유형 매핑 ─────────────────────────────────────── */
 const FEE_TYPE_MAP: Record<string, string> = {
   수수료율: "RATE",
   정액: "FIXED",
@@ -26,15 +29,13 @@ const rowSchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "계약종료일: YYYY-MM-DD 형식"),
   serviceAmount: z.number({ error: "서비스금액 숫자 필수" }).min(0),
-  billingCycle: z.enum(["QUARTERLY", "SEMI_ANNUAL", "ANNUAL"], {
-    error: "청구주기: 분기|반기|연간",
-  }),
+  billingCycle: billingCycleSchema,
   assigneeId: z.string().min(1, "담당자를 찾을 수 없음"),
   hasMerchantFee: z.boolean(),
   merchantFeeType: z.enum(["RATE", "FIXED"]).optional(),
   merchantFeeRate: z.number().optional(),
   merchantFeeAmount: z.number().optional(),
-  merchantFeeCycle: z.enum(["QUARTERLY", "SEMI_ANNUAL", "ANNUAL"]).optional(),
+  merchantFeeCycle: merchantSettlementCycleSchema.optional(),
   note: z.string().optional(),
 });
 
@@ -54,6 +55,7 @@ const bodySchema = z.object({
       수수료유형: z.string().optional(),
       "수수료율(%)": z.union([z.string(), z.number()]).optional(),
       "수수료금액(원)": z.union([z.string(), z.number()]).optional(),
+      가맹점정산주기: z.string().optional(),
       수수료청구주기: z.string().optional(),
       비고: z.string().optional(),
     })
@@ -138,11 +140,23 @@ export async function POST(req: Request) {
     if (!assigneeId) errors.push(`담당자 '${assigneeName}'을 찾을 수 없음`);
 
     const cycleKey = toStr(raw["청구주기"]);
-    const billingCycle = CYCLE_MAP[cycleKey] ?? "";
+    const billingCycle = BILLING_CYCLE_IMPORT_MAP[cycleKey];
+    if (!billingCycle) {
+      errors.push(`청구주기: ${BILLING_CYCLE_IMPORT_LABELS}`);
+    }
 
     const hasMerchantFee = toStr(raw["가맹점수수료"]).toUpperCase() === "Y";
     const feeTypeKey = toStr(raw["수수료유형"]);
     const merchantFeeType = FEE_TYPE_MAP[feeTypeKey];
+
+    const merchantCycleKey =
+      toStr(raw["가맹점정산주기"]) || toStr(raw["수수료청구주기"]);
+    const merchantFeeCycle = hasMerchantFee
+      ? MERCHANT_SETTLEMENT_IMPORT_MAP[merchantCycleKey]
+      : undefined;
+    if (hasMerchantFee && merchantCycleKey && !merchantFeeCycle) {
+      errors.push(`가맹점정산주기: ${MERCHANT_SETTLEMENT_IMPORT_LABELS}`);
+    }
 
     const candidate = {
       localGovName: toStr(raw["지자체명"]),
@@ -157,7 +171,7 @@ export async function POST(req: Request) {
       merchantFeeType: hasMerchantFee && merchantFeeType ? merchantFeeType as "RATE" | "FIXED" : undefined,
       merchantFeeRate: hasMerchantFee ? toNum(raw["수수료율(%)"]) : undefined,
       merchantFeeAmount: hasMerchantFee ? toNum(raw["수수료금액(원)"]) : undefined,
-      merchantFeeCycle: hasMerchantFee ? (CYCLE_MAP[toStr(raw["수수료청구주기"])] as "QUARTERLY" | "SEMI_ANNUAL" | "ANNUAL" | undefined) : undefined,
+      merchantFeeCycle,
       note: toStr(raw["비고"]) || undefined,
     };
 

@@ -57,11 +57,11 @@ export const attendanceStatusMap: Record<
   string,
   { label: string; color: string; bg: string }
 > = {
-  NORMAL:      { label: "정상", color: "text-green-700",  bg: "bg-green-50"  },
-  LATE:        { label: "지각", color: "text-yellow-700", bg: "bg-yellow-50" },
-  EARLY_LEAVE: { label: "조퇴", color: "text-orange-700", bg: "bg-orange-50" },
-  ABSENT:      { label: "결근", color: "text-red-700",    bg: "bg-red-50"    },
-  ON_LEAVE:    { label: "휴가", color: "text-blue-700",   bg: "bg-blue-50"   },
+  NORMAL:      { label: "정상", color: "text-deep-violet",     bg: "bg-shadow-tint-blue" },
+  LATE:        { label: "지각", color: "text-rich-plum",       bg: "bg-hint-of-sky" },
+  EARLY_LEAVE: { label: "조퇴", color: "text-rich-plum",       bg: "bg-hint-of-sky" },
+  ABSENT:      { label: "결근", color: "text-deep-space-charcoal", bg: "bg-hint-of-sky" },
+  ON_LEAVE:    { label: "휴가", color: "text-electric-blue",   bg: "bg-shadow-tint-blue" },
 };
 
 // 휴가 종류 한글
@@ -71,4 +71,5 @@ export const leaveTypeMap: Record<string, string> = {
   SICK:     "병가",
   PUBLIC:   "공가",
   SPECIAL:  "경조사",
+  SUMMER:   "여름휴가",
 };
