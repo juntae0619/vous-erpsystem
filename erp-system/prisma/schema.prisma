@@ -1,0 +1,391 @@
+// ============================================================
+// ERP System — Prisma Schema
+// Database: PostgreSQL
+// ============================================================
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  // driverAdapters is now stable in Prisma v7 - no preview flag needed
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum AttendanceStatus {
+  NORMAL
+  LATE
+  EARLY_LEAVE
+  ABSENT
+  ON_LEAVE
+}
+
+enum LeaveType {
+  ANNUAL    // 연차
+  HALF_DAY  // 반차
+  SICK      // 병가
+  PUBLIC    // 공가
+  SPECIAL   // 경조사
+}
+
+enum HalfDayType {
+  AM
+  PM
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApprovalDocType {
+  GENERAL   // 일반결재
+  EXPENSE   // 지출결의서
+  CONTRACT  // 계약결재
+  REPORT    // 업무보고
+}
+
+enum ApprovalStatus {
+  DRAFT
+  SUBMITTED
+  IN_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum ApprovalStepRole {
+  MANAGER   // 팀장
+  DIRECTOR  // 이사
+  CEO       // 대표
+}
+
+enum ApprovalStepStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SKIPPED   // 전결로 인한 생략
+}
+
+enum BillingCycle {
+  QUARTERLY    // 분기
+  SEMI_ANNUAL  // 반기
+  ANNUAL       // 연
+}
+
+enum ContractStatus {
+  ACTIVE
+  ENDED
+  RENEWAL_PENDING
+}
+
+enum MerchantFeeType {
+  RATE   // 수수료율(%)
+  FIXED  // 정액
+}
+
+enum TaxInvoiceStatus {
+  NOT_ISSUED  // 미발행
+  ISSUED      // 발행완료
+  REVISED     // 수정발행
+}
+
+enum PaymentStatus {
+  UNPAID   // 미입금
+  PARTIAL  // 부분입금
+  PAID     // 완납
+  OVERDUE  // 연체
+}
+
+enum DisbursementType {
+  MERCHANT_PAYMENT  // 가맹점 대금
+  OTHER             // 기타
+}
+
+enum NotificationType {
+  APPROVAL_SUBMITTED
+  APPROVAL_APPROVED
+  APPROVAL_REJECTED
+  LEAVE_APPROVED
+  LEAVE_REJECTED
+  BILLING_OVERDUE
+}
+
+// ============================================================
+// MODELS
+// ============================================================
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  team      String?
+  position  String?
+  phone     String?
+  joinedAt  DateTime @default(now())
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attendances           AttendanceRecord[]
+  leaveBalances         LeaveBalance[]
+  leaveRequests         LeaveRequest[]       @relation("LeaveRequester")
+  approvedLeaves        LeaveRequest[]       @relation("LeaveApprover")
+  submittedDocuments    ApprovalDocument[]   @relation("Submitter")
+  approvalSteps         ApprovalStep[]
+  finalDecisions        ApprovalDocument[]   @relation("FinalDecider")
+  contracts             Contract[]           @relation("ContractAssignee")
+  disbursements         Disbursement[]
+  notifications         Notification[]
+  auditLogs             AuditLog[]
+  attendanceSettings    AttendanceSettings[]
+
+  @@map("users")
+}
+
+model AttendanceSettings {
+  id           String   @id @default(cuid())
+  checkInTime  String   @default("09:00")
+  checkOutTime String   @default("18:00")
+  updatedAt    DateTime @updatedAt
+  updatedById  String
+  updatedBy    User     @relation(fields: [updatedById], references: [id])
+
+  @@map("attendance_settings")
+}
+
+model AttendanceRecord {
+  id          String           @id @default(cuid())
+  userId      String
+  date        DateTime         @db.Date
+  checkIn     DateTime?
+  checkOut    DateTime?
+  status      AttendanceStatus @default(NORMAL)
+  workMinutes Int?
+  note        String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+  @@map("attendance_records")
+}
+
+model LeaveBalance {
+  id            String   @id @default(cuid())
+  userId        String
+  year          Int
+  totalDays     Decimal  @db.Decimal(5, 1)
+  usedDays      Decimal  @default(0) @db.Decimal(5, 1)
+  carryOverDays Decimal  @default(0) @db.Decimal(5, 1)
+  totalHalfDays Int      @default(0)
+  usedHalfDays  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, year])
+  @@map("leave_balances")
+}
+
+model LeaveRequest {
+  id              String       @id @default(cuid())
+  userId          String
+  type            LeaveType
+  halfDayType     HalfDayType?
+  startDate       DateTime     @db.Date
+  endDate         DateTime     @db.Date
+  days            Decimal      @db.Decimal(5, 1)
+  reason          String
+  status          LeaveStatus  @default(PENDING)
+  approverId      String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user     User  @relation("LeaveRequester", fields: [userId], references: [id])
+  approver User? @relation("LeaveApprover", fields: [approverId], references: [id])
+
+  @@map("leave_requests")
+}
+
+model ApprovalDocument {
+  id              String          @id @default(cuid())
+  type            ApprovalDocType
+  title           String
+  content         String          @db.Text
+  submitterId     String
+  status          ApprovalStatus  @default(DRAFT)
+  isFinalDecision Boolean         @default(false)
+  finalDeciderId  String?
+  expenseAmount   Decimal?        @db.Decimal(15, 0)
+  expenseItems    String?         @db.Text
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  submitter    User               @relation("Submitter", fields: [submitterId], references: [id])
+  finalDecider User?              @relation("FinalDecider", fields: [finalDeciderId], references: [id])
+  steps        ApprovalStep[]
+  attachments  ApprovalAttachment[]
+
+  @@map("approval_documents")
+}
+
+model ApprovalStep {
+  id         String             @id @default(cuid())
+  documentId String
+  stepRole   ApprovalStepRole
+  approverId String?
+  stepOrder  Int
+  status     ApprovalStepStatus @default(PENDING)
+  comment    String?
+  decidedAt  DateTime?
+  createdAt  DateTime           @default(now())
+
+  document ApprovalDocument @relation(fields: [documentId], references: [id])
+  approver User?            @relation(fields: [approverId], references: [id])
+
+  @@map("approval_steps")
+}
+
+model ApprovalAttachment {
+  id         String   @id @default(cuid())
+  documentId String
+  fileName   String
+  fileUrl    String
+  fileSize   Int
+  fileType   String
+  createdAt  DateTime @default(now())
+
+  document ApprovalDocument @relation(fields: [documentId], references: [id])
+
+  @@map("approval_attachments")
+}
+
+model Contract {
+  id                String           @id @default(cuid())
+  localGovName      String
+  contractNumber    String           @unique
+  contractName      String
+  startDate         DateTime         @db.Date
+  endDate           DateTime         @db.Date
+  serviceAmount     Decimal          @db.Decimal(15, 0)
+  billingCycle      BillingCycle
+  assigneeId        String
+  contractFileUrl   String?
+  status            ContractStatus   @default(ACTIVE)
+  hasMerchantFee    Boolean          @default(false)
+  merchantFeeType   MerchantFeeType?
+  merchantFeeRate   Decimal?         @db.Decimal(5, 2)
+  merchantFeeAmount Decimal?         @db.Decimal(15, 0)
+  merchantFeeCycle  BillingCycle?
+  note              String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  assignee User      @relation("ContractAssignee", fields: [assigneeId], references: [id])
+  billings Billing[]
+
+  @@map("contracts")
+}
+
+model Billing {
+  id               String           @id @default(cuid())
+  contractId       String
+  billingDate      DateTime         @db.Date
+  dueDate          DateTime         @db.Date
+  serviceAmount    Decimal          @db.Decimal(15, 0)
+  merchantFeeAmt   Decimal          @default(0) @db.Decimal(15, 0)
+  totalAmount      Decimal          @db.Decimal(15, 0)
+  taxInvoiceStatus TaxInvoiceStatus @default(NOT_ISSUED)
+  taxInvoiceNumber String?
+  taxInvoiceDate   DateTime?        @db.Date
+  paymentStatus    PaymentStatus    @default(UNPAID)
+  paidAmount       Decimal          @default(0) @db.Decimal(15, 0)
+  note             String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  contract Contract  @relation(fields: [contractId], references: [id])
+  payments Payment[]
+
+  @@map("billings")
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  billingId String
+  paidAt    DateTime @db.Date
+  amount    Decimal  @db.Decimal(15, 0)
+  note      String?
+  createdAt DateTime @default(now())
+
+  billing Billing @relation(fields: [billingId], references: [id])
+
+  @@map("payments")
+}
+
+model Disbursement {
+  id            String           @id @default(cuid())
+  assigneeId    String
+  vendorName    String
+  itemType      DisbursementType
+  description   String
+  amount        Decimal          @db.Decimal(15, 0)
+  scheduledDate DateTime         @db.Date
+  paidDate      DateTime?        @db.Date
+  isPaid        Boolean          @default(false)
+  note          String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  assignee User @relation(fields: [assigneeId], references: [id])
+
+  @@map("disbursements")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
