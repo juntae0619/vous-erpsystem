@@ -396,3 +396,25 @@ model AuditLog {
 
   @@map("audit_logs")
 }
+
+// ============================================================
+// 지자체 담당자 연락처
+// ============================================================
+
+model LocalGovContact {
+  id           String   @id @default(cuid())
+  region       String   // 지역 (경상, 충청, 전북, 전남, 강원, 경기)
+  city         String   // 시/군
+  cardName     String?  // 카드명 (창원희망카드, 꿈자람카드 등)
+  allowedItems String?  // 허용 품목
+  department   String?  // 부서명
+  contactName  String?  // 담당자
+  jobDuty      String?  // 담당업무
+  phone        String?  // 회사연락처
+  email        String?  // 이메일
+  cardBinNo    String?  // 카드 빈번호
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("local_gov_contacts")
+}

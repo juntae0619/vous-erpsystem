@@ -16,6 +16,7 @@ import {
   LogOut,
   ChevronRight,
   Shield,
+  BookUser,
 } from "lucide-react";
 
 const navItems = [
@@ -25,6 +26,7 @@ const navItems = [
   { label: "전자결재", href: "/approval", icon: FileText },
   { label: "계약·수금 관리", href: "/contract", icon: Building2 },
   { label: "지급 관리", href: "/disbursement", icon: Wallet },
+  { label: "지자체 연락처", href: "/local-gov-contacts", icon: BookUser },
   { label: "사용자 관리", href: "/users", icon: Users, adminOnly: true },
   { label: "감사 로그", href: "/admin/audit", icon: Shield, adminOnly: true },
   { label: "내 프로필", href: "/profile", icon: UserCircle },
