@@ -21,18 +21,17 @@ export function ContractPageActions({ exportHref }: Props) {
         <ExportButton href={exportHref} label="Excel" />
         <Button
           variant="outline"
-          size="sm"
           className="gap-1.5"
           onClick={() => setShowUpload(true)}
         >
-          <Upload size={13} />
+          <Upload size={14} />
           Excel 업로드
         </Button>
         <Link
           href="/contract/new"
-          className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
+          className={cn(buttonVariants(), "gap-1.5")}
         >
-          <Plus size={13} />
+          <Plus size={14} />
           계약 등록
         </Link>
       </div>

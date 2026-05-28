@@ -40,9 +40,20 @@ export default async function AttendancePage() {
             take: 1,
           },
         },
-        orderBy: [{ team: "asc" }, { name: "asc" }],
+        orderBy: { name: "asc" },
       })
     : [];
+
+  const nameOrder = ["박상호", "박준태", "박승원", "김지숙", "김희진", "김선희"];
+
+  allToday.sort((a, b) => {
+    const ia = nameOrder.indexOf(a.name);
+    const ib = nameOrder.indexOf(b.name);
+    if (ia === -1 && ib === -1) return a.name.localeCompare(b.name, "ko");
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
 
   return (
     <div className="flex flex-col h-full overflow-hidden">

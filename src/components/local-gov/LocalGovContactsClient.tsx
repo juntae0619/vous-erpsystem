@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Phone, Mail, CreditCard, Building2, MapPin, Pencil, Trash2 } from "lucide-react";
+import { Search, Phone, Mail, CreditCard, Building2, MapPin, Pencil, Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   LocalGovContactEditDialog,
@@ -39,6 +39,7 @@ export function LocalGovContactsClient({ contacts, regions }: Props) {
   const [search, setSearch] = useState("");
   const [activeRegion, setActiveRegion] = useState<string>("전체");
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
@@ -49,8 +50,10 @@ export function LocalGovContactsClient({ contacts, regions }: Props) {
       const matchSearch =
         !q ||
         [c.city, c.contactName, c.department, c.jobDuty, c.phone, c.email, c.cardBinNo, c.cardName]
+
           .some((v) => v?.toLowerCase().includes(q));
       return matchRegion && matchSearch;
+
     });
   }, [contacts, search, activeRegion]);
 
@@ -90,6 +93,14 @@ export function LocalGovContactsClient({ contacts, regions }: Props) {
   return (
     <div className="flex-1 overflow-y-auto p-6">
       <div className="mx-auto max-w-6xl space-y-5">
+        {/* 추가 버튼 */}
+        <div className="flex justify-end">
+          <Button className="gap-1.5" onClick={() => setIsAdding(true)}>
+            <Plus size={14} />
+            연락처 추가
+          </Button>
+        </div>
+
         {/* 검색 + 필터 */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
@@ -156,11 +167,6 @@ export function LocalGovContactsClient({ contacts, regions }: Props) {
                             <span className="text-caption text-smoke-gray">
                               ({first.cardName})
                             </span>
-                          )}
-                          {first.allowedItems && (
-                            <Badge variant="outline" className="text-xs">
-                              허용: {first.allowedItems}
-                            </Badge>
                           )}
                         </div>
 
@@ -233,28 +239,26 @@ export function LocalGovContactsClient({ contacts, regions }: Props) {
                               </div>
 
                               {/* 수정 / 삭제 */}
-                              <div className="flex items-center justify-end gap-1 sm:justify-start">
+                              <div className="flex items-center justify-end gap-2 sm:justify-start">
                                 <Button
                                   type="button"
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  className="text-smoke-gray hover:text-midnight-charcoal"
+                                  variant="outline"
+                                  className="gap-1.5 border-border text-midnight-charcoal hover:bg-hint-of-sky"
                                   onClick={() => setEditingContact(c)}
                                   disabled={deletingId === c.id}
-                                  title="수정"
                                 >
-                                  <Pencil size={13} />
+                                  <Pencil size={14} />
+                                  수정
                                 </Button>
                                 <Button
                                   type="button"
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  className="text-smoke-gray hover:text-rich-plum"
+                                  variant="outline"
+                                  className="gap-1.5 border-border text-rich-plum hover:bg-red-50 hover:border-red-200"
                                   onClick={() => handleDelete(c)}
                                   disabled={deletingId === c.id}
-                                  title="삭제"
                                 >
-                                  <Trash2 size={13} />
+                                  <Trash2 size={14} />
+                                  삭제
                                 </Button>
                               </div>
                             </div>
@@ -270,12 +274,18 @@ export function LocalGovContactsClient({ contacts, regions }: Props) {
         )}
       </div>
 
+      {/* 수정 다이얼로그 */}
       <LocalGovContactEditDialog
         contact={editingContact}
         open={!!editingContact}
-        onOpenChange={(open) => {
-          if (!open) setEditingContact(null);
-        }}
+        onOpenChange={(open) => { if (!open) setEditingContact(null); }}
+      />
+
+      {/* 추가 다이얼로그 */}
+      <LocalGovContactEditDialog
+        contact={null}
+        open={isAdding}
+        onOpenChange={(open) => { if (!open) setIsAdding(false); }}
       />
     </div>
   );

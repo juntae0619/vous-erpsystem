@@ -60,9 +60,9 @@ export default async function ApprovalPage() {
   const newDocBtn = (
     <Link
       href="/approval/new"
-      className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
+      className={cn(buttonVariants(), "gap-1.5")}
     >
-      <Plus size={13} />
+      <Plus size={14} />
       문서 작성
     </Link>
   );
@@ -94,12 +94,12 @@ export default async function ApprovalPage() {
               내 문서
             </h2>
             {myDocs.length === 0 ? (
-              <Card className="p-8 shadow-card border-[#e8e8e8] rounded-xl text-center">
+              <Card className="py-16 shadow-card border-[#e8e8e8] rounded-xl text-center">
                 <FileText size={32} className="text-[#e8e8e8] mx-auto mb-3" />
-                <p className="text-[13px] text-[#b3b3b3]">작성한 문서가 없습니다</p>
+                <p className="text-[13px] text-[#b3b3b3] mb-4">작성한 문서가 없습니다</p>
                 <Link
                   href="/approval/new"
-                  className={cn(buttonVariants({ variant: "outline" }), "mt-3 h-8 text-[13px] border-[#e8e8e8] rounded-lg")}
+                  className={cn(buttonVariants({ variant: "outline" }), "text-[13px] border-[#e8e8e8] rounded-lg")}
                 >
                   문서 작성하기
                 </Link>

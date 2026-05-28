@@ -48,13 +48,12 @@ export function ExportButton({ href, label = "Excel", className }: ExportButtonP
 
   return (
     <Button
-      variant="ghost"
-      size="sm"
-      className={`h-8 text-[12px] text-[#292d34] hover:bg-[#e9ebf0] rounded-lg px-3 gap-1.5 ${className ?? ""}`}
+      variant="outline"
+      className={`gap-1.5 ${className ?? ""}`}
       onClick={handleExport}
       disabled={loading}
     >
-      <Download size={13} />
+      <Download size={14} />
       {loading ? "처리 중..." : label}
     </Button>
   );

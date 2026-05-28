@@ -30,10 +30,25 @@ export async function GET() {
         take: 1,
       },
     },
-    orderBy: [{ team: "asc" }, { name: "asc" }],
+    orderBy: { name: "asc" },
   });
 
-  const result = users.map((u) => ({
+  const positionOrder: Record<string, number> = {
+    "대표이사": 1,
+    "이사":     2,
+    "부장":     3,
+    "과장":     4,
+    "대리":     5,
+    "사원":     6,
+  };
+
+  const sorted = users.sort((a, b) => {
+    const pa = positionOrder[a.position ?? ""] ?? 99;
+    const pb = positionOrder[b.position ?? ""] ?? 99;
+    return pa !== pb ? pa - pb : a.name.localeCompare(b.name, "ko");
+  });
+
+  const result = sorted.map((u) => ({
     id:         u.id,
     name:       u.name,
     team:       u.team,

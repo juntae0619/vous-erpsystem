@@ -139,10 +139,11 @@ model User {
   team      String?
   position  String?
   phone     String?
-  joinedAt  DateTime @default(now())
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  joinedAt           DateTime @default(now())
+  isActive           Boolean  @default(true)
+  mustChangePassword Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   attendances           AttendanceRecord[]
   leaveBalances         LeaveBalance[]

@@ -1,156 +1,545 @@
-/**
- * 지자체 담당자 연락처 데이터 임포트 스크립트
- * 실행: npx tsx prisma/seed-local-gov-contacts.ts
- */
-
-import * as XLSX from "xlsx";
-import { PrismaClient } from "../src/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import * as path from "path";
-import * as dotenv from "dotenv";
-
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+import 'dotenv/config';
+import { PrismaClient } from '../src/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
-interface RawRow {
-  region: string | null;
-  city: string | null;
-  allowedItems: string | null;
-  department: string | null;
-  contactName: string | null;
-  jobDuty: string | null;
-  phone: string | null;
-  email: string | null;
-  cardBinNo: string | null;
-}
-
-function cleanText(val: unknown): string | null {
-  if (val === null || val === undefined) return null;
-  const s = String(val).trim().replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  return s === "" ? null : s;
-}
-
-/** "창원시\n(창원희망카드,\nPOP카드)" → { city: "창원시", cardName: "창원희망카드, POP카드" } */
-function parseCityAndCard(raw: string): { city: string; cardName: string | null } {
-  const parts = raw.split("\n").map((s) => s.trim()).filter(Boolean);
-  const cityPart = parts[0] ?? raw;
-  const cardParts = parts
-    .slice(1)
-    .join(" ")
-    .replace(/[()]/g, "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const cardName = cardParts.length > 0 ? cardParts.join(", ") : null;
-  return { city: cityPart.trim(), cardName };
-}
-
 async function main() {
-  const xlsxPath = path.resolve(
-    "C:/Users/박준태/Desktop/지자체 담당자연락처_erp.xlsx"
-  );
-
-  const wb = XLSX.readFile(xlsxPath);
-  const ws = wb.Sheets["Sheet1"];
-  const rawData: unknown[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
-
-  // 헤더 행 제거 (index 0)
-  const rows = rawData.slice(1) as (string | null | undefined)[][];
-
-  // 누적 region / city / cardName / allowedItems (셀 병합 형태)
-  let curRegion = "";
-  let curCity = "";
-  let curCardName: string | null = null;
-  let curAllowed: string | null = null;
-
-  const contacts: {
-    region: string;
-    city: string;
-    cardName: string | null;
-    allowedItems: string | null;
-    department: string | null;
-    contactName: string | null;
-    jobDuty: string | null;
-    phone: string | null;
-    email: string | null;
-    cardBinNo: string | null;
-  }[] = [];
-
-  for (const row of rows) {
-    const [col0, col1, col2, col3, col4, col5, col6, col7, col8] = row;
-
-    const regionRaw = cleanText(col0);
-    const cityRaw = cleanText(col1);
-    const allowedRaw = cleanText(col2);
-    const deptRaw = cleanText(col3);
-    const contactRaw = cleanText(col4);
-    const dutyRaw = cleanText(col5);
-    const phoneRaw = cleanText(col6);
-    const emailRaw = cleanText(col7);
-    const binRaw = cleanText(col8);
-
-    // region 갱신
-    if (regionRaw) curRegion = regionRaw.replace(/\n/g, "");
-
-    // city 갱신
-    if (cityRaw) {
-      const parsed = parseCityAndCard(cityRaw);
-      curCity = parsed.city;
-      curCardName = parsed.cardName;
-    }
-
-    // allowedItems 갱신 (city와 같은 행에만 등장)
-    if (cityRaw) {
-      curAllowed = allowedRaw;
-    }
-
-    // 담당자가 여러 명인 경우 (\n 구분) → 각각 분리
-    const contactNames = (contactRaw ?? "").split("\n").map((s) => s.trim()).filter(Boolean);
-    const jobDuties = (dutyRaw ?? "").split("\n").map((s) => s.trim()).filter(Boolean);
-    const phones = (phoneRaw ?? "").split("\n").map((s) => s.trim()).filter(Boolean);
-    const emails = (emailRaw ?? "").split("\n").map((s) => s.trim()).filter(Boolean);
-
-    const count = Math.max(contactNames.length, 1);
-    for (let i = 0; i < count; i++) {
-      const cn = contactNames[i] ?? null;
-      const jd = jobDuties[i] ?? jobDuties[0] ?? null;
-      const ph = phones[i] ?? phones[0] ?? null;
-      const em = emails[i] ?? emails[0] ?? null;
-
-      // 완전히 빈 행 스킵
-      if (!cn && !ph && !em && !deptRaw) continue;
-
-      contacts.push({
-        region: curRegion,
-        city: curCity,
-        cardName: curCardName,
-        allowedItems: curAllowed,
-        department: deptRaw,
-        contactName: cn ? cn.replace(/\s+/g, " ").trim() : null,
-        jobDuty: jd,
-        phone: ph ? ph.replace(/\s+/g, "").trim() : null,
-        email: em ? em.replace(/\s+/g, "").trim() : null,
-        cardBinNo: binRaw ? binRaw.replace(/\n/g, ", ") : null,
-      });
-    }
-  }
-
-  console.log(`총 ${contacts.length}건 파싱 완료. DB에 저장 중...`);
-
-  // 기존 데이터 삭제 후 재삽입
-  await prisma.localGovContact.deleteMany();
-  await prisma.localGovContact.createMany({ data: contacts });
-
-  console.log(`✅ ${contacts.length}건 저장 완료`);
-  contacts.forEach((c, i) =>
-    console.log(
-      `  [${i + 1}] ${c.region} / ${c.city} / ${c.contactName ?? "-"} / ${c.phone ?? "-"}`
-    )
-  );
+  console.log('🌱 지자체 담당자 연락처 시드 시작...');
+  await prisma.localGovContact.deleteMany({});
+  const data = [
+    {
+      region: "경상",
+      city: "창원시",
+      cardName: "창원희망카드,POP카드",
+      allowedItems: undefined,
+      department: "아동청소년과",
+      contactName: "이보람 주무관",
+      jobDuty: "급식",
+      phone: "055-225-4186",
+      email: "cw1125@korea.kr",
+      cardBinNo: "7142-4812,4813 4814,4815,4820 아동센터 7142-88",
+    },
+    {
+      region: "경상",
+      city: "창원시",
+      cardName: "창원희망카드,POP카드",
+      allowedItems: undefined,
+      department: "아동청소년과",
+      contactName: "김진미 주무관",
+      jobDuty: "아동보육교사",
+      phone: "055-225-3808",
+      email: "zim0809@korea.kr",
+      cardBinNo: "7142-4812,4813 4814,4815,4820 아동센터 7142-88",
+    },
+    {
+      region: "경상",
+      city: "창원시",
+      cardName: "창원희망카드,POP카드",
+      allowedItems: undefined,
+      department: "아동청소년과",
+      contactName: "최화형 주무관",
+      jobDuty: "아동센터",
+      phone: "055-225-3914",
+      email: "mirr314@korea.kr",
+      cardBinNo: "7142-4812,4813 4814,4815,4820 아동센터 7142-88",
+    },
+    {
+      region: "경상",
+      city: "김해시",
+      cardName: "꿈자람카드",
+      allowedItems: "컵라면",
+      department: "아동청소년과",
+      contactName: "이연지 주무관",
+      jobDuty: "아동센터",
+      phone: "055-330-6759",
+      email: "abwldi@korea.kr",
+      cardBinNo: "7142-4825",
+    },
+    {
+      region: "경상",
+      city: "김해시",
+      cardName: "꿈자람카드",
+      allowedItems: "컵라면",
+      department: "아동청소년과",
+      contactName: "장연자 주무관",
+      jobDuty: "아동센터",
+      phone: "055-330-6757",
+      email: "doublesk2@korea.kr",
+      cardBinNo: "7142-4825",
+    },
+    {
+      region: "경상",
+      city: "김해시",
+      cardName: "꿈자람카드",
+      allowedItems: "컵라면",
+      department: "아동청소년과",
+      contactName: "남은경 주무관",
+      jobDuty: "다함께돌봄센터",
+      phone: "055-330-6755",
+      email: "semi76@korea.kr",
+      cardBinNo: "7142-4825",
+    },
+    {
+      region: "경상",
+      city: "밀양시",
+      cardName: "미르카드",
+      allowedItems: "컵라면",
+      department: "여성가족과",
+      contactName: "조은유 주무관",
+      jobDuty: "급식",
+      phone: "055-359-5172",
+      email: "joeun229@korea.kr",
+      cardBinNo: "7142-4827",
+    },
+    {
+      region: "경상",
+      city: "밀양시",
+      cardName: "미르카드",
+      allowedItems: "컵라면",
+      department: "여성가족과",
+      contactName: "김아람 주무관",
+      jobDuty: "아동센터",
+      phone: "055-359-6006",
+      email: "ariram@korea.kr",
+      cardBinNo: "7142-4827",
+    },
+    {
+      region: "경상",
+      city: "밀양시",
+      cardName: "미르카드",
+      allowedItems: "컵라면",
+      department: "회계과",
+      contactName: "김현지 주무관",
+      jobDuty: "아동센터회계",
+      phone: "055-359-5148",
+      email: "kjane312@korea.kr",
+      cardBinNo: "7142-4827",
+    },
+    {
+      region: "경상",
+      city: "사천시",
+      cardName: "사천행복카드",
+      allowedItems: "컵라면",
+      department: "여성가족과",
+      contactName: "한보람 주무관",
+      jobDuty: "급식/센터",
+      phone: "055-831-2672",
+      email: "kr1004br@korea.kr",
+      cardBinNo: "7142-4824",
+    },
+    {
+      region: "경상",
+      city: "고성군",
+      cardName: "고성행복카드",
+      allowedItems: "봉지/컵라면",
+      department: "교육청소년과",
+      contactName: "배원경 주무관",
+      jobDuty: "급식",
+      phone: "055-670-2627",
+      email: "baewg@korea.kr",
+      cardBinNo: "7142-4882",
+    },
+    {
+      region: "경상",
+      city: "고성군",
+      cardName: "고성행복카드",
+      allowedItems: "봉지/컵라면",
+      department: "교육청소년과",
+      contactName: "최미혜 주무관",
+      jobDuty: "꿈키움",
+      phone: "055-670-4663",
+      email: "mihye86@korea.kr",
+      cardBinNo: "7142-5548",
+    },
+    {
+      region: "경상",
+      city: "창녕군",
+      cardName: "창녕행복카드",
+      allowedItems: "봉지/컵라면",
+      department: "행복나눔과",
+      contactName: "구민아 주무관",
+      jobDuty: "아동센터",
+      phone: "055-530-1423",
+      email: "buzz98@korea.kr",
+      cardBinNo: "7142-4874",
+    },
+    {
+      region: "경상",
+      city: "통영시",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "여성가족과",
+      contactName: "박한솔 주무관",
+      jobDuty: "아동센터",
+      phone: "055-650-4622",
+      email: "hansol8710@korea.kr",
+      cardBinNo: "7142-4822",
+    },
+    {
+      region: "경상",
+      city: "거제시",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "아동청소년과",
+      contactName: "최귀향 주무관",
+      jobDuty: "급식/체험카드",
+      phone: "055-639-4764",
+      email: "hyang0715@korea.kr",
+      cardBinNo: "7142-4831,5531",
+    },
+    {
+      region: "경상",
+      city: "거제시",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "아동청소년과",
+      contactName: "김민경 주무관",
+      jobDuty: "아동센터",
+      phone: "055-639-3752",
+      email: "sailing@korea.kr",
+      cardBinNo: "7142-4831,5531",
+    },
+    {
+      region: "경상",
+      city: "거제시",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "가족정책과",
+      contactName: "윤수림 주무관",
+      jobDuty: "양육바우처",
+      phone: "055-639-4934",
+      email: "cosmos447@korea.kr",
+      cardBinNo: "7142-5139",
+    },
+    {
+      region: "경상",
+      city: "남해군",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "청년혁신과",
+      contactName: "이혜민 주무관",
+      jobDuty: "아동센터",
+      phone: "055-860-8650",
+      email: "flgpals930@korea.kr",
+      cardBinNo: undefined,
+    },
+    {
+      region: "경상",
+      city: "함양군",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "사회복지과",
+      contactName: "김갑인 주무관",
+      jobDuty: "꿈드림",
+      phone: "055-960-4844",
+      email: "hahagoijn@korea.kr",
+      cardBinNo: undefined,
+    },
+    {
+      region: "경상",
+      city: "거창군",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "인구교육과",
+      contactName: "정순응 주무관",
+      jobDuty: "꿈키움",
+      phone: "055-940-8702",
+      email: "zegom@korea.kr",
+      cardBinNo: "7142-5535",
+    },
+    {
+      region: "경상",
+      city: "거창군",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "복지정책과",
+      contactName: "오새해 주무관",
+      jobDuty: "어르신",
+      phone: "055-940-3092",
+      email: "togo111@korea.kr",
+      cardBinNo: "7142-5585",
+    },
+    {
+      region: "경상",
+      city: "거창군",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "행복나눔과",
+      contactName: "김선영 주무관",
+      jobDuty: "아동센터",
+      phone: "055-940-3783",
+      email: "presentoy@korea.kr",
+      cardBinNo: "7142-5579",
+    },
+    {
+      region: "경상",
+      city: "문경시",
+      cardName: undefined,
+      allowedItems: "봉지/컵라면",
+      department: "교육지원과",
+      contactName: "김소영 주무관",
+      jobDuty: "아동 꿈키움",
+      phone: "054-550-6616",
+      email: "mayer3@korea.kr",
+      cardBinNo: "7142-5564",
+    },
+    {
+      region: "충청",
+      city: "홍성군",
+      cardName: "꿈자람카드",
+      allowedItems: "컵라면",
+      department: "가정행복과",
+      contactName: "황해정 주무관",
+      jobDuty: "급식",
+      phone: "041-630-1939",
+      email: "ritahwang@korea.kr",
+      cardBinNo: "7142-4480",
+    },
+    {
+      region: "충청",
+      city: "서산시",
+      cardName: "꿈자람카드",
+      allowedItems: "컵라면",
+      department: "가족지원과",
+      contactName: "이어진 주무관",
+      jobDuty: "급식",
+      phone: "041-660-2667",
+      email: "djwlss@korea.kr",
+      cardBinNo: "7142-4421 7142-41**",
+    },
+    {
+      region: "충청",
+      city: "서산시",
+      cardName: "꿈자람카드",
+      allowedItems: "컵라면",
+      department: "가족지원과",
+      contactName: "최유정 주무관",
+      jobDuty: "아동센터",
+      phone: "041-660-3054",
+      email: "mjsy3@korea.kr",
+      cardBinNo: "7142-4421 7142-41**",
+    },
+    {
+      region: "충청",
+      city: "청양군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "복지정책과",
+      contactName: "김지형 주무관",
+      jobDuty: "꿈키움",
+      phone: "041-940-2613",
+      email: "kjh0620@korea.kr",
+      cardBinNo: "7142-5579",
+    },
+    {
+      region: "충청",
+      city: "제천시",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "여성가족과",
+      contactName: "박지연 주무관",
+      jobDuty: "꿈모아",
+      phone: "043-641-5473",
+      email: "pjy66311@korea.kr",
+      cardBinNo: "7142-5515",
+    },
+    {
+      region: "충청",
+      city: "옥천군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "행복교육과",
+      contactName: "박유진 주무관",
+      jobDuty: "꿈키움",
+      phone: "043-730-4983",
+      email: "pyj00310@korea.kr",
+      cardBinNo: "7142-5543",
+    },
+    {
+      region: "충청",
+      city: "보은군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "주민행복과",
+      contactName: "강재원 주무관",
+      jobDuty: "꿈키움",
+      phone: "043-540-3626",
+      email: "won29495@korea.kr",
+      cardBinNo: "7142-5545",
+    },
+    {
+      region: "충청",
+      city: "보은군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "주민행복과",
+      contactName: "이정희 주무관",
+      jobDuty: "양육비",
+      phone: "043-540-3833",
+      email: "leejungod9@korea.kr",
+      cardBinNo: "7142-5551",
+    },
+    {
+      region: "충청",
+      city: "충주시",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "여성청소년과",
+      contactName: "김도경 주무관",
+      jobDuty: "문화바우처",
+      phone: "043-850-6872",
+      email: "dokyeong11@korea.kr",
+      cardBinNo: "7142-5546",
+    },
+    {
+      region: "충청",
+      city: "영동군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "가족행복과",
+      contactName: "이수연 주무관",
+      jobDuty: "교육바우처",
+      phone: "043-740-3773",
+      email: "sueleedue@korea.kr",
+      cardBinNo: "7142-5533",
+    },
+    {
+      region: "충청",
+      city: "영동군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "주민복지과",
+      contactName: "오강현 주무관",
+      jobDuty: "어르신",
+      phone: "043-740-3357",
+      email: "jabez84@korea.kr",
+      cardBinNo: "7142-5133",
+    },
+    {
+      region: "전북",
+      city: "장수군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "행정지원과",
+      contactName: "빈은서 주무관",
+      jobDuty: "꿈키움",
+      phone: "063-350-2168",
+      email: "bin0803@korea.kr",
+      cardBinNo: "7142-5532",
+    },
+    {
+      region: "전남",
+      city: "진도군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "가족행복과",
+      contactName: "김다현 주무관",
+      jobDuty: "꿈키움",
+      phone: "061-540-1294",
+      email: "di8288@korea.kr",
+      cardBinNo: "7142-5537",
+    },
+    {
+      region: "전남",
+      city: "진도군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "가족행복과",
+      contactName: "임지수 주무관",
+      jobDuty: "어르신",
+      phone: "061-540-1274",
+      email: "jindo2240@korea.kr",
+      cardBinNo: "7142-5144",
+    },
+    {
+      region: "전남",
+      city: "장성군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "주민복지과",
+      contactName: "박진양 주무관",
+      jobDuty: "꿈키움",
+      phone: "061-390-7416",
+      email: "parkjy0921@korea.kr",
+      cardBinNo: "7142-5538",
+    },
+    {
+      region: "강원",
+      city: "태백시",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "교육과",
+      contactName: "함성희 주무관",
+      jobDuty: "꿈탄탄",
+      phone: "033-550-3855",
+      email: "ks21m@korea.kr",
+      cardBinNo: "7142-5561",
+    },
+    {
+      region: "강원",
+      city: "횡성군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "가족복지과",
+      contactName: "김예림 주무관",
+      jobDuty: "희망채움",
+      phone: "033-340-5870",
+      email: "yell1256@korea.kr",
+      cardBinNo: "7142-5562",
+    },
+    {
+      region: "강원",
+      city: "평창군",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "인재육성과",
+      contactName: "김민재 주무관",
+      jobDuty: "꿈키움",
+      phone: "033-330-2723",
+      email: "minjae5602@korea.kr",
+      cardBinNo: "7142-5563, 5131(나다움)",
+    },
+    {
+      region: "경기",
+      city: "포천시",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "교육정책과",
+      contactName: "정혜진 주무관",
+      jobDuty: "문화바우처",
+      phone: "031-538-2022",
+      email: "jhy2j311@korea.kr",
+      cardBinNo: "7142-5571",
+    },
+    {
+      region: "전남",
+      city: "목포시",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "드림스타트",
+      contactName: "박진경 주무관",
+      jobDuty: "아동센터",
+      phone: "061-270-4838",
+      email: "pingcat0819@korea.kr",
+      cardBinNo: undefined,
+    },
+    {
+      region: "전남",
+      city: "목포시",
+      cardName: undefined,
+      allowedItems: "컵라면",
+      department: "드림스타트",
+      contactName: "김현숙 선생님",
+      jobDuty: "아동센터",
+      phone: "061-270-8151",
+      email: "",
+      cardBinNo: undefined,
+    },
+  ];
+  await prisma.localGovContact.createMany({ data });
+  console.log(`✅ ${data.length}개 레코드 삽입 완료`);
 }
 
-main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+main().catch(console.error).finally(() => prisma.$disconnect());

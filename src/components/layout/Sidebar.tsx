@@ -93,22 +93,17 @@ export function Sidebar({ userRole, userName, userPosition }: SidebarProps) {
       </nav>
 
       <div className="border-t border-border p-3">
-        <div className="mb-1 flex items-center gap-2.5 rounded-[var(--radius-buttons)] px-2 py-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-hint-of-sky text-body-sm font-semibold text-midnight-charcoal">
-            {userName?.[0] ?? "U"}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-body-sm font-semibold tracking-body-sm text-deep-space-charcoal">
-              {userName ?? "사용자"}
-            </p>
-            <p className="truncate text-caption text-smoke-gray">
-              {userPosition ?? userRole ?? ""}
-            </p>
-          </div>
+        <div className="mb-1 flex flex-col items-center py-2">
+          <p className="text-body-sm font-semibold tracking-body-sm text-deep-space-charcoal">
+            {userName ?? "사용자"}
+          </p>
+          <p className="text-caption text-smoke-gray">
+            {userPosition ?? userRole ?? ""}
+          </p>
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="nav-link flex w-full items-center gap-2.5 rounded-[var(--radius-buttons)] px-3 py-2 text-body-sm text-smoke-gray hover:bg-hint-of-sky"
+          className="nav-link flex w-full items-center justify-center gap-2.5 rounded-[var(--radius-buttons)] px-3 py-2 text-body-sm text-smoke-gray hover:bg-hint-of-sky"
         >
           <LogOut size={14} />
           로그아웃

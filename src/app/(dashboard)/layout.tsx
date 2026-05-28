@@ -10,6 +10,7 @@ export default async function DashboardLayout({
 }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  if (session.user.mustChangePassword) redirect("/change-password");
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },

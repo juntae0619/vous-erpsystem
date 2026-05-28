@@ -6,7 +6,7 @@ import { z } from "zod/v4";
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(1),
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -21,6 +21,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = (user as any).role;
         token.name = user.name;
         token.email = user.email;
+        token.mustChangePassword = (user as any).mustChangePassword;
       }
       return token;
     },
@@ -29,6 +30,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // token.sub는 NextAuth v5가 user.id로 자동 설정 — token.id가 없는 기존 세션 대비 fallback
         session.user.id = (token.id ?? token.sub) as string;
         session.user.role = token.role as string;
+        session.user.mustChangePassword = token.mustChangePassword as boolean;
       }
       return session;
     },
@@ -55,6 +57,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             password: true,
             role: true,
             isActive: true,
+            mustChangePassword: true,
           },
         });
 
@@ -68,6 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           email: user.email,
           role: user.role,
+          mustChangePassword: user.mustChangePassword,
         };
       },
     }),

@@ -47,10 +47,15 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 interface Props {
-  contact: LocalGovContactData | null;
+  contact: LocalGovContactData | null; // null이면 추가 모드
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+const EMPTY_FORM: FormData = {
+  region: "", city: "", cardName: "", allowedItems: "",
+  department: "", contactName: "", jobDuty: "", phone: "", email: "", cardBinNo: "",
+};
 
 function toFormValues(contact: LocalGovContactData): FormData {
   return {
@@ -68,6 +73,7 @@ function toFormValues(contact: LocalGovContactData): FormData {
 }
 
 export function LocalGovContactEditDialog({ contact, open, onOpenChange }: Props) {
+  const isEdit = !!contact;
   const router = useRouter();
   const {
     register,
@@ -80,36 +86,43 @@ export function LocalGovContactEditDialog({ contact, open, onOpenChange }: Props
   });
 
   useEffect(() => {
-    if (contact && open) {
-      reset(toFormValues(contact));
+    if (open) {
+      reset(contact ? toFormValues(contact) : EMPTY_FORM);
     }
   }, [contact, open, reset]);
 
   const onSubmit = async (data: FormData) => {
-    if (!contact) return;
+    const body = {
+      ...data,
+      cardName: data.cardName || null,
+      allowedItems: data.allowedItems || null,
+      department: data.department || null,
+      contactName: data.contactName || null,
+      jobDuty: data.jobDuty || null,
+      phone: data.phone || null,
+      email: data.email || null,
+      cardBinNo: data.cardBinNo || null,
+    };
 
-    const res = await fetch(`/api/local-gov-contacts/${contact.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...data,
-        cardName: data.cardName || null,
-        allowedItems: data.allowedItems || null,
-        department: data.department || null,
-        contactName: data.contactName || null,
-        jobDuty: data.jobDuty || null,
-        phone: data.phone || null,
-        email: data.email || null,
-        cardBinNo: data.cardBinNo || null,
-      }),
-    });
+    const res = isEdit
+      ? await fetch(`/api/local-gov-contacts/${contact.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        })
+      : await fetch("/api/local-gov-contacts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
     const json = await res.json();
     if (!res.ok) {
-      toast.error(json.error ?? "수정에 실패했습니다");
+      toast.error(json.error ?? (isEdit ? "수정에 실패했습니다" : "추가에 실패했습니다"));
       return;
     }
 
-    toast.success("연락처가 수정되었습니다");
+    toast.success(isEdit ? "연락처가 수정되었습니다" : "연락처가 추가되었습니다");
     onOpenChange(false);
     router.refresh();
   };
@@ -118,7 +131,7 @@ export function LocalGovContactEditDialog({ contact, open, onOpenChange }: Props
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>연락처 수정</DialogTitle>
+          <DialogTitle>{isEdit ? "연락처 수정" : "연락처 추가"}</DialogTitle>
         </DialogHeader>
 
         <form
@@ -143,15 +156,9 @@ export function LocalGovContactEditDialog({ contact, open, onOpenChange }: Props
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="form-field">
-              <Label>카드명</Label>
-              <Input className="form-input h-9" {...register("cardName")} />
-            </div>
-            <div className="form-field">
-              <Label>허용 품목</Label>
-              <Input className="form-input h-9" {...register("allowedItems")} />
-            </div>
+          <div className="form-field">
+            <Label>카드명</Label>
+            <Input className="form-input h-9" {...register("cardName")} />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -191,7 +198,7 @@ export function LocalGovContactEditDialog({ contact, open, onOpenChange }: Props
               취소
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "저장 중..." : "저장"}
+              {isSubmitting ? "저장 중..." : isEdit ? "저장" : "추가"}
             </Button>
           </DialogFooter>
         </form>
