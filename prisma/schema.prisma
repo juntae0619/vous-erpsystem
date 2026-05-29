@@ -288,9 +288,14 @@ model Contract {
   localGovName      String
   contractNumber    String           @unique
   contractName      String
-  startDate         DateTime         @db.Date
-  endDate           DateTime         @db.Date
+  deptContact       String?          // 담당부서(담당자)
+  contactPhone      String?          // 연락처
+  contractMethod    String?          // 계약방법 (수의계약 등)
+  startDate         DateTime         @db.Date  // 계약일
+  commencementDate  DateTime?        @db.Date  // 착수일
+  endDate           DateTime         @db.Date  // 완수일
   serviceAmount     Decimal          @db.Decimal(15, 0)
+  billingMethod     String?          // 청구방법 (정률/정액)
   billingCycle      BillingCycle
   assigneeId        String
   contractFileUrl   String?

@@ -31,10 +31,15 @@ export async function GET(
 
 const updateSchema = z.object({
   localGovName: z.string().min(1).optional(),
+  deptContact: z.string().optional().nullable(),
+  contactPhone: z.string().optional().nullable(),
   contractName: z.string().min(1).optional(),
+  contractMethod: z.string().optional().nullable(),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  commencementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   serviceAmount: z.number().min(0).optional(),
+  billingMethod: z.string().optional().nullable(),
   billingCycle: billingCycleSchema.optional(),
   assigneeId: z.string().optional(),
   status: z.enum(["ACTIVE", "ENDED", "RENEWAL_PENDING"]).optional(),
@@ -67,10 +72,17 @@ export async function PUT(
     where: { id },
     data: {
       ...(data.localGovName && { localGovName: data.localGovName }),
+      ...(data.deptContact !== undefined && { deptContact: data.deptContact }),
+      ...(data.contactPhone !== undefined && { contactPhone: data.contactPhone }),
       ...(data.contractName && { contractName: data.contractName }),
+      ...(data.contractMethod !== undefined && { contractMethod: data.contractMethod }),
       ...(data.startDate && { startDate: new Date(data.startDate) }),
+      ...(data.commencementDate !== undefined && {
+        commencementDate: data.commencementDate ? new Date(data.commencementDate) : null,
+      }),
       ...(data.endDate && { endDate: new Date(data.endDate) }),
       ...(data.serviceAmount !== undefined && { serviceAmount: data.serviceAmount }),
+      ...(data.billingMethod !== undefined && { billingMethod: data.billingMethod }),
       ...(data.billingCycle && { billingCycle: data.billingCycle }),
       ...(data.assigneeId && { assigneeId: data.assigneeId }),
       ...(data.status && { status: data.status }),

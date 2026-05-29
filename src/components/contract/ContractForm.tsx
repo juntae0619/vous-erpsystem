@@ -23,6 +23,18 @@ import {
   type MerchantSettlementCycleValue,
 } from "@/lib/billing-cycle";
 
+const CONTRACT_METHOD_OPTIONS = [
+  { value: "수의계약", label: "수의계약" },
+  { value: "일반경쟁", label: "일반경쟁" },
+  { value: "제한경쟁", label: "제한경쟁" },
+  { value: "지명경쟁", label: "지명경쟁" },
+] as const;
+
+const BILLING_METHOD_OPTIONS = [
+  { value: "정률", label: "정률" },
+  { value: "정액", label: "정액" },
+] as const;
+
 const FEE_TYPE_OPTIONS = [
   { value: "RATE",  label: "수수료율 (%)" },
   { value: "FIXED", label: "정액" },
@@ -41,12 +53,17 @@ interface Props {
 }
 
 const schema = z.object({
-  localGovName: z.string().min(1, "지자체명을 입력해주세요"),
+  localGovName: z.string().min(1, "기관명을 입력해주세요"),
   contractNumber: z.string().min(1, "계약번호를 입력해주세요"),
+  deptContact: z.string().optional(),
+  contactPhone: z.string().optional(),
   contractName: z.string().min(1, "계약명을 입력해주세요"),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "날짜 형식이 올바르지 않습니다"),
+  contractMethod: z.string().optional(),
+  commencementDate: z.string().optional(),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "날짜 형식이 올바르지 않습니다"),
-  serviceAmount: z.string().min(1, "서비스 금액을 입력해주세요"),
+  serviceAmount: z.string().min(1, "계약금액을 입력해주세요"),
+  billingMethod: z.string().optional(),
   billingCycle: billingCycleSchema,
   assigneeId: z.string().min(1, "담당자를 선택해주세요"),
   hasMerchantFee: z.boolean().default(false),
@@ -100,10 +117,11 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
       <Card className="gap-4">
         <h3 className="font-heading text-section-title">계약 기본 정보</h3>
 
+        {/* 기관명 + 계약번호 */}
         <div className="grid grid-cols-2 gap-4">
           <div className="form-field">
-            <Label>지자체명</Label>
-            <Input {...register("localGovName")} placeholder="예) 서울시 종로구" />
+            <Label>기관명</Label>
+            <Input {...register("localGovName")} placeholder="예) 경상남도 거창군청" />
             {errors.localGovName && <p className="text-caption text-destructive">{errors.localGovName.message}</p>}
           </div>
           <div className="form-field">
@@ -113,33 +131,80 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
           </div>
         </div>
 
+        {/* 담당부서(담당자) + 연락처 */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="form-field">
+            <Label>담당부서(담당자)</Label>
+            <Input {...register("deptContact")} placeholder="예) 재무과 홍길동" />
+          </div>
+          <div className="form-field">
+            <Label>연락처</Label>
+            <Input {...register("contactPhone")} placeholder="예) 055-000-0000" />
+          </div>
+        </div>
+
+        {/* 계약명 */}
         <div className="form-field">
           <Label>계약명</Label>
           <Input {...register("contractName")} placeholder="계약명 입력" />
           {errors.contractName && <p className="text-caption text-destructive">{errors.contractName.message}</p>}
         </div>
 
+        {/* 계약일 + 계약방법 */}
         <div className="grid grid-cols-2 gap-4">
           <div className="form-field">
-            <Label>계약 시작일</Label>
+            <Label>계약일</Label>
             <Input type="date" {...register("startDate")} />
             {errors.startDate && <p className="text-caption text-destructive">{errors.startDate.message}</p>}
           </div>
           <div className="form-field">
-            <Label>계약 종료일</Label>
+            <Label>계약방법</Label>
+            <Select value={watch("contractMethod") ?? ""} onValueChange={(v) => setValue("contractMethod", v)}>
+              <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
+              <SelectContent className="rounded-xl border-border">
+                {CONTRACT_METHOD_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value} className="text-body-sm">{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* 착수일 + 완수일 */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="form-field">
+            <Label>착수일</Label>
+            <Input type="date" {...register("commencementDate")} />
+          </div>
+          <div className="form-field">
+            <Label>완수일</Label>
             <Input type="date" {...register("endDate")} />
             {errors.endDate && <p className="text-caption text-destructive">{errors.endDate.message}</p>}
           </div>
         </div>
 
+        {/* 계약금액 */}
+        <div className="form-field">
+          <Label>계약금액 (원)</Label>
+          <Input type="number" {...register("serviceAmount")} placeholder="0" />
+          {errors.serviceAmount && <p className="text-caption text-destructive">{errors.serviceAmount.message}</p>}
+        </div>
+
+        {/* 청구방법 + 청구주기 */}
         <div className="grid grid-cols-2 gap-4">
           <div className="form-field">
-            <Label>서비스 금액 (원)</Label>
-            <Input type="number" {...register("serviceAmount")} placeholder="0" />
-            {errors.serviceAmount && <p className="text-caption text-destructive">{errors.serviceAmount.message}</p>}
+            <Label>청구방법</Label>
+            <Select value={watch("billingMethod") ?? ""} onValueChange={(v) => setValue("billingMethod", v)}>
+              <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
+              <SelectContent className="rounded-xl border-border">
+                {BILLING_METHOD_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value} className="text-body-sm">{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="form-field">
-            <Label>청구 주기</Label>
+            <Label>청구주기</Label>
             <Select value={watch("billingCycle")} onValueChange={(v) => setValue("billingCycle", v as BillingCycleValue)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent className="rounded-xl border-border">
@@ -151,8 +216,9 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
           </div>
         </div>
 
+        {/* 담당자 (내부 직원) */}
         <div className="form-field">
-          <Label>담당자</Label>
+          <Label>담당자 (내부)</Label>
           <Select value={watch("assigneeId") ?? ""} onValueChange={(v) => setValue("assigneeId", v ?? "")}>
             <SelectTrigger><SelectValue placeholder="담당자 선택" /></SelectTrigger>
             <SelectContent className="rounded-xl border-border">
@@ -167,6 +233,7 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
         </div>
       </Card>
 
+      {/* 가맹점 수수료 */}
       <Card className="gap-4">
         <div className="flex items-center gap-2">
           <input
@@ -220,6 +287,7 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
         )}
       </Card>
 
+      {/* 비고 */}
       <Card>
         <div className="form-field">
           <Label>비고</Label>
