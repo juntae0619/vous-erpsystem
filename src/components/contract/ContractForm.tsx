@@ -159,7 +159,7 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
           </div>
           <div className="form-field">
             <Label>계약방법</Label>
-            <Select value={watch("contractMethod") ?? ""} onValueChange={(v) => setValue("contractMethod", v)}>
+            <Select value={watch("contractMethod") ?? ""} onValueChange={(v) => setValue("contractMethod", v || undefined)}>
               <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
               <SelectContent className="rounded-xl border-border">
                 {CONTRACT_METHOD_OPTIONS.map((o) => (
@@ -194,7 +194,7 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
         <div className="grid grid-cols-2 gap-4">
           <div className="form-field">
             <Label>청구방법</Label>
-            <Select value={watch("billingMethod") ?? ""} onValueChange={(v) => setValue("billingMethod", v)}>
+            <Select value={watch("billingMethod") ?? ""} onValueChange={(v) => setValue("billingMethod", v || undefined)}>
               <SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger>
               <SelectContent className="rounded-xl border-border">
                 {BILLING_METHOD_OPTIONS.map((o) => (
