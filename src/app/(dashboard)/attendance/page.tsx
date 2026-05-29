@@ -147,4 +147,8 @@ export default async function AttendancePage() {
 
           {/* 월별 달력 */}
           <AttendanceCalendar />
- 
+        </div>
+      </div>
+    </div>
+  );
+}

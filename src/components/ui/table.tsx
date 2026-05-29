@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 
@@ -111,4 +111,6 @@ export {
   TableFooter,
   TableHead,
   TableRow,
-  
+  TableCell,
+  TableCaption,
+}
