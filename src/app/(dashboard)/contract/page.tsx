@@ -5,7 +5,6 @@ import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { ContractPageActions } from "@/components/contract/ContractPageActions";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FileText, Search } from "lucide-react";
 import { formatKRW, cn } from "@/lib/utils";
 
@@ -53,7 +52,7 @@ export default async function ContractPage({
     include: {
       billings: { select: { totalAmount: true, paidAmount: true } },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "asc" },
   });
 
   let rows: ContractRow[] = contracts.map((c) => {
@@ -76,7 +75,6 @@ export default async function ContractPage({
 
   if (onlyUnpaid) rows = rows.filter((r) => r.unpaid > 0);
 
-  // 6개 요약 지표
   const totalContracts = rows.length;
   const totalService = rows.reduce((s, r) => s + r.serviceAmount, 0);
   const totalBilled = rows.reduce((s, r) => s + r.billed, 0);
@@ -92,29 +90,22 @@ export default async function ContractPage({
   ) : undefined;
 
   const metrics = [
-    { label: "계약 건수", value: `${totalContracts}건`, color: "text-midnight-charcoal" },
-    { label: "계약금 총액", value: formatKRW(totalService), color: "text-midnight-charcoal" },
-    { label: "청구액 총액", value: formatKRW(totalBilled), color: "text-midnight-charcoal" },
-    { label: "입금액 총액", value: formatKRW(totalPaid), color: "text-deep-violet" },
-    { label: "미수액 총액", value: formatKRW(totalUnpaid), color: totalUnpaid > 0 ? "text-rich-plum" : "text-smoke-gray" },
-    { label: "미청구액 총액", value: formatKRW(totalUnbilled), color: totalUnbilled > 0 ? "text-rich-plum" : "text-smoke-gray" },
+    { label: "계약 건수",    value: String(totalContracts),    highlight: false },
+    { label: "계약금 총액",  value: formatKRW(totalService),   highlight: false },
+    { label: "청구액 총액",  value: formatKRW(totalBilled),    highlight: false },
+    { label: "입금액 총액",  value: formatKRW(totalPaid),      highlight: false },
+    { label: "미수액 총액",  value: formatKRW(totalUnpaid),    highlight: totalUnpaid > 0 },
+    { label: "미청구액 총액",value: formatKRW(totalUnbilled),  highlight: false },
   ];
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <Header title="계약·수금 관리" actions={managerActions} />
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="section-stack mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl space-y-5">
 
-          {/* 6개 요약 지표 */}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-            {metrics.map((s) => (
-              <Card key={s.label} className="text-center">
-                <p className="mb-1 text-caption text-smoke-gray">{s.label}</p>
-                <p className={`text-kpi text-[16px] ${s.color}`}>{s.value}</p>
-              </Card>
-            ))}
-          </div>
+          {/* 대시보드 타이틀 */}
+          <h2 className="font-heading text-xl font-bold text-midnight-charcoal">대시보드</h2>
 
           {/* 검색 + 필터 */}
           <form method="get" className="flex flex-wrap items-center gap-3">
@@ -143,12 +134,33 @@ export default async function ContractPage({
               />
               미수 있는 건만
             </label>
-            <button type="submit" className={cn(buttonVariants({ variant: "outline" }), "h-9")}>
+            <button type="submit" className={cn(buttonVariants(), "h-9")}>
               검색
             </button>
           </form>
 
-          {/* 계약 목록 (표) */}
+          {/* 요약 지표 (2행 × 3열) */}
+          <div className="grid grid-cols-3 gap-4">
+            {metrics.map((m) => (
+              <Card
+                key={m.label}
+                className={cn(
+                  "px-5 py-4",
+                  m.highlight && "bg-orange-50 border-orange-200"
+                )}
+              >
+                <p className="mb-1.5 text-caption text-smoke-gray">{m.label}</p>
+                <p className={cn(
+                  "text-2xl font-bold tracking-tight",
+                  m.highlight ? "text-rich-plum" : "text-midnight-charcoal"
+                )}>
+                  {m.value}
+                </p>
+              </Card>
+            ))}
+          </div>
+
+          {/* 계약 목록 */}
           <div>
             <h2 className="mb-3 font-heading text-section-title">계약 목록</h2>
 
@@ -165,44 +177,51 @@ export default async function ContractPage({
                 )}
               </Card>
             ) : (
-              <Card className="p-0 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>계약번호</TableHead>
-                      <TableHead>지역</TableHead>
-                      <TableHead>기관명</TableHead>
-                      <TableHead>계약명</TableHead>
-                      <TableHead className="text-right">계약금액</TableHead>
-                      <TableHead className="text-right">청구액</TableHead>
-                      <TableHead className="text-right">입금액</TableHead>
-                      <TableHead className="text-right">미수액</TableHead>
-                      <TableHead className="text-right">미청구액</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rows.map((r) => (
-                      <TableRow key={r.id} className="cursor-pointer hover:bg-[#f8f9fb]">
-                        <TableCell className="whitespace-nowrap">
-                          <Link href={`/contract/${r.id}`} className="text-deep-violet hover:underline">
-                            {r.contractNumber}
+              <div className="overflow-hidden rounded-xl border border-border">
+                <table className="w-full text-body-sm">
+                  <thead>
+                    <tr className="bg-[#2c3e6b] text-white">
+                      <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">연번</th>
+                      <th className="px-4 py-3 text-left font-semibold whitespace-nowrap">지역</th>
+                      <th className="px-4 py-3 text-left font-semibold whitespace-nowrap">기관명</th>
+                      <th className="px-4 py-3 text-left font-semibold">계약명</th>
+                      <th className="px-4 py-3 text-right font-semibold whitespace-nowrap">계약금액</th>
+                      <th className="px-4 py-3 text-right font-semibold whitespace-nowrap">청구액</th>
+                      <th className="px-4 py-3 text-right font-semibold whitespace-nowrap">입금액</th>
+                      <th className="px-4 py-3 text-right font-semibold whitespace-nowrap">미수액</th>
+                      <th className="px-4 py-3 text-right font-semibold whitespace-nowrap">미청구액</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {rows.map((r, idx) => (
+                      <tr key={r.id} className="hover:bg-hint-of-sky transition-colors">
+                        <td className="px-4 py-3 text-center text-smoke-gray">{idx + 1}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-smoke-gray">{r.region ?? "-"}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <Link href={`/contract/${r.id}`} className="text-deep-violet hover:underline font-medium">
+                            {r.localGovName}
                           </Link>
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-smoke-gray">{r.region ?? "-"}</TableCell>
-                        <TableCell className="whitespace-nowrap">{r.localGovName}</TableCell>
-                        <TableCell className="max-w-[260px] truncate" title={r.contractName}>{r.contractName}</TableCell>
-                        <TableCell className="text-right whitespace-nowrap">{formatKRW(r.serviceAmount)}</TableCell>
-                        <TableCell className="text-right whitespace-nowrap">{formatKRW(r.billed)}</TableCell>
-                        <TableCell className="text-right whitespace-nowrap text-deep-violet">{formatKRW(r.paid)}</TableCell>
-                        <TableCell className={cn("text-right whitespace-nowrap", r.unpaid > 0 ? "text-rich-plum font-medium" : "")}>{formatKRW(r.unpaid)}</TableCell>
-                        <TableCell className={cn("text-right whitespace-nowrap", r.unbilled > 0 ? "text-rich-plum" : "")}>{formatKRW(r.unbilled)}</TableCell>
-                      </TableRow>
+                        </td>
+                        <td className="px-4 py-3 max-w-[280px]">
+                          <span className="line-clamp-2 leading-snug" title={r.contractName}>{r.contractName}</span>
+                        </td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">{formatKRW(r.serviceAmount)}</td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">{formatKRW(r.billed)}</td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">{formatKRW(r.paid)}</td>
+                        <td className={cn("px-4 py-3 text-right whitespace-nowrap", r.unpaid > 0 ? "text-rich-plum font-semibold" : "")}>
+                          {formatKRW(r.unpaid)}
+                        </td>
+                        <td className={cn("px-4 py-3 text-right whitespace-nowrap", r.unbilled > 0 ? "text-smoke-gray" : "")}>
+                          {formatKRW(r.unbilled)}
+                        </td>
+                      </tr>
                     ))}
-                  </TableBody>
-                </Table>
-              </Card>
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
+
         </div>
       </div>
     </div>
