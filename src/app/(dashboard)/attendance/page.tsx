@@ -90,14 +90,14 @@ export default async function AttendancePage() {
 
             {/* 관리자: 전 직원 오늘 현황 */}
             {isManager && (
-              <Card className="p-5 shadow-card border-[#e8e8e8] rounded-xl">
-                <h3
-                  className="text-[14px] font-semibold text-[#090c1d] mb-3 tracking-[-0.15px]"
-                  style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
-                >
-                  전 직원 오늘 현황
-                </h3>
-                <div className="space-y-2 max-h-[240px] overflow-y-auto">
+              <Card className="overflow-hidden p-0 shadow-card border-[#e8e8e8] rounded-xl">
+                <div className="bg-[#2c3e6b] px-5 py-3">
+                  <h3 className="text-[14px] font-semibold text-white tracking-[-0.15px]">
+                    전 직원 오늘 현황
+                  </h3>
+                </div>
+                <div className="p-5">
+                <div className="space-y-2 max-h-[220px] overflow-y-auto">
                   {allToday.map((u) => {
                     const att = u.attendances[0];
                     const leave = u.leaveRequests[0];
@@ -139,6 +139,7 @@ export default async function AttendancePage() {
                       </div>
                     );
                   })}
+                </div>
                 </div>
               </Card>
             )}

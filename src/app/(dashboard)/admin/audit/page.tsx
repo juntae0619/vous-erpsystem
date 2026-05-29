@@ -104,9 +104,9 @@ export default async function AuditPage({
             ) : (
               <div className="divide-y divide-[#f0f0f0]">
                 {/* 헤더 */}
-                <div className="grid grid-cols-[1fr_1fr_1fr_2fr_140px] gap-4 px-4 py-2.5 bg-[#f8f9fb]">
+                <div className="grid grid-cols-[1fr_1fr_1fr_2fr_140px] gap-4 px-4 py-3 bg-[#2c3e6b]">
                   {["시간", "사용자", "액션", "상세", "리소스"].map((h) => (
-                    <p key={h} className="text-[11px] font-medium text-[#b3b3b3] uppercase tracking-wide">{h}</p>
+                    <p key={h} className="text-[11px] font-semibold text-white uppercase tracking-wide">{h}</p>
                   ))}
                 </div>
 

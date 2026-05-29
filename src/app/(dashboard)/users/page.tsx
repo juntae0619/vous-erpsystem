@@ -46,9 +46,9 @@ export default async function UsersPage() {
           {/* 사용자 카드 목록 */}
           <Card className="shadow-card border-[#e8e8e8] rounded-xl overflow-hidden">
             {/* 테이블 헤더 */}
-            <div className="grid grid-cols-[1fr_1fr_100px_100px_120px_100px] gap-4 px-5 py-3 bg-[#e9ebf0] border-b border-[#e8e8e8]">
+            <div className="grid grid-cols-[1fr_1fr_100px_100px_120px_100px] gap-4 px-5 py-3 bg-[#2c3e6b]">
               {["이름/팀", "이메일", "권한", "직책", "입사일", "관리"].map((h) => (
-                <p key={h} className="text-[11px] font-semibold text-[#b3b3b3] uppercase tracking-wide">
+                <p key={h} className="text-[11px] font-semibold text-white uppercase tracking-wide">
                   {h}
                 </p>
               ))}
