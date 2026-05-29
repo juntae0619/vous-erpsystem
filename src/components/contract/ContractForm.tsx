@@ -7,6 +7,7 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod/v4";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Plus, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +24,7 @@ import {
   type MerchantSettlementCycleValue,
 } from "@/lib/billing-cycle";
 
-const REQUIRED_DOCS = [
+const DEFAULT_DOCS = [
   "선금신청서 외",
   "보증보험",
   "전자계산서",
@@ -96,17 +97,22 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
     defaultValues: { billingCycle: "QUARTERLY", ...defaultValues },
   });
 
-  const [checkedDocs, setCheckedDocs] = useState<string[]>(() => {
+  const [requiredDocs, setRequiredDocs] = useState<string[]>(() => {
     try {
       const raw = (defaultValues as Record<string, unknown>)?.requiredDocs as string | undefined;
-      return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
+      const parsed = raw ? JSON.parse(raw) : null;
+      return Array.isArray(parsed) && parsed.length > 0 ? parsed : [...DEFAULT_DOCS];
+    } catch { return [...DEFAULT_DOCS]; }
   });
 
-  function toggleDoc(doc: string) {
-    setCheckedDocs((prev) =>
-      prev.includes(doc) ? prev.filter((d) => d !== doc) : [...prev, doc]
-    );
+  function updateDoc(idx: number, value: string) {
+    setRequiredDocs((prev) => prev.map((d, i) => i === idx ? value : d));
+  }
+  function removeDoc(idx: number) {
+    setRequiredDocs((prev) => prev.filter((_, i) => i !== idx));
+  }
+  function addDoc() {
+    setRequiredDocs((prev) => [...prev, ""]);
   }
 
   const hasMerchantFee = watch("hasMerchantFee");
@@ -124,7 +130,7 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
         serviceAmount: parseFloat(data.serviceAmount),
         merchantFeeRate: data.merchantFeeRate ? parseFloat(data.merchantFeeRate) : undefined,
         merchantFeeAmount: data.merchantFeeAmount ? parseFloat(data.merchantFeeAmount) : undefined,
-        requiredDocs: JSON.stringify(checkedDocs),
+        requiredDocs: JSON.stringify(requiredDocs.filter(Boolean)),
       }),
     });
     const json = await res.json();
@@ -313,19 +319,37 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
       {/* 청구 시 필요서류 */}
       <Card className="gap-4">
         <h3 className="font-heading text-section-title">청구 시 필요서류</h3>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {REQUIRED_DOCS.map((item) => (
-            <label key={item} className="flex items-center gap-2 cursor-pointer text-body-sm text-midnight-charcoal">
-              <input
-                type="checkbox"
-                className="h-4 w-4 accent-deep-violet"
-                checked={checkedDocs.includes(item)}
-                onChange={() => toggleDoc(item)}
+        <div className="flex flex-col gap-2">
+          {requiredDocs.map((doc, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <span className="w-5 shrink-0 text-caption text-smoke-gray text-right">{idx + 1}</span>
+              <Input
+                value={doc}
+                onChange={(e) => updateDoc(idx, e.target.value)}
+                placeholder="서류명 입력"
+                className="h-9"
               />
-              {item}
-            </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                className="shrink-0 border-border text-smoke-gray hover:text-rich-plum hover:border-red-200 hover:bg-red-50"
+                onClick={() => removeDoc(idx)}
+              >
+                <X size={14} />
+              </Button>
+            </div>
           ))}
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="mt-1 gap-1.5 self-start text-smoke-gray"
+          onClick={addDoc}
+        >
+          <Plus size={14} />
+          항목 추가
+        </Button>
       </Card>
 
       {/* 비고 */}
