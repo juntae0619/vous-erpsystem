@@ -285,15 +285,19 @@ model ApprovalAttachment {
 
 model Contract {
   id                String           @id @default(cuid())
+  region            String?          // 지역 (예: 경상남도 거창군)
   localGovName      String
   contractNumber    String           @unique
   contractName      String
-  deptContact       String?          // 담당부서(담당자)
+  department        String?          // 담당부서
+  managerName       String?          // 담당자(기관)
+  deptContact       String?          // (구) 담당부서(담당자) - 하위호환
   contactPhone      String?          // 연락처
   contractMethod    String?          // 계약방법 (수의계약 등)
   startDate         DateTime         @db.Date  // 계약일
   commencementDate  DateTime?        @db.Date  // 착수일
   endDate           DateTime         @db.Date  // 완수일
+  nextBillingDate   DateTime?        @db.Date  // 다음 청구 예정일
   serviceAmount     Decimal          @db.Decimal(15, 0)
   billingMethod     String?          // 청구방법 (정률/정액)
   requiredDocs      String?          // 청구 시 필요서류 (JSON 배열)

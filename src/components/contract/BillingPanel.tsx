@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PaymentStatusBadge, TaxInvoiceStatusBadge } from "@/components/contract/ContractStatusBadge";
+import { PaymentStatusBadge } from "@/components/contract/ContractStatusBadge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatKRW } from "@/lib/utils";
 
 interface Payment {
@@ -166,94 +167,93 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
       )}
 
       {billings.length === 0 ? (
-        <p className="text-[13px] text-[#b3b3b3] text-center py-4">청구 내역이 없습니다</p>
+        <p className="text-[13px] text-[#b3b3b3] text-center py-4">수금 내역이 없습니다</p>
       ) : (
-        <div className="space-y-3">
-          {billings.map((billing) => (
-            <div key={billing.id} className="border border-[#e8e8e8] rounded-xl overflow-hidden">
-              {/* 청구 헤더 */}
-              <div className="p-3 bg-[#f8f9fb] flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-[12px] font-medium text-[#292d34]">
-                    {format(new Date(billing.billingDate), "yyyy.MM.dd", { locale: ko })} 청구
-                  </span>
-                  <PaymentStatusBadge status={billing.paymentStatus as Parameters<typeof PaymentStatusBadge>[0]["status"]} />
-                  <TaxInvoiceStatusBadge status={billing.taxInvoiceStatus as Parameters<typeof TaxInvoiceStatusBadge>[0]["status"]} />
-                </div>
-                <span className="text-[13px] font-semibold text-[#090c1d]">
-                  {formatKRW(billing.totalAmount)}
-                </span>
-              </div>
-
-              {/* 청구 상세 */}
-              <div className="p-3 space-y-2">
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div>
-                    <p className="text-[10px] text-[#b3b3b3]">서비스금액</p>
-                    <p className="text-[12px] font-medium text-[#292d34]">{formatKRW(billing.serviceAmount)}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-[#b3b3b3]">수수료</p>
-                    <p className="text-[12px] font-medium text-[#292d34]">{formatKRW(billing.merchantFeeAmt)}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-[#b3b3b3]">입금액</p>
-                    <p className="text-caption font-medium text-deep-violet">{formatKRW(billing.paidAmount)}</p>
-                  </div>
-                </div>
-
-                <p className="text-[11px] text-[#b3b3b3]">
-                  납부기한: {format(new Date(billing.dueDate), "yyyy.MM.dd", { locale: ko })}
-                </p>
-
-                {/* 입금 내역 */}
-                {billing.payments.length > 0 && (
-                  <div className="space-y-1 pt-1 border-t border-[#e8e8e8]">
-                    {billing.payments.map((p) => (
-                      <div key={p.id} className="flex justify-between text-[12px]">
-                        <span className="text-[#292d34]">
-                          {format(new Date(p.paidAt), "MM.dd", { locale: ko })} 입금
-                          {p.note && <span className="text-[#b3b3b3] ml-1">({p.note})</span>}
-                        </span>
-                        <span className="font-medium text-deep-violet">+{formatKRW(p.amount)}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* 입금 등록 폼 */}
-                {paymentBillingId === billing.id ? (
-                  <form onSubmit={paymentForm.handleSubmit(submitPayment as any)} className="pt-2 space-y-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input className="h-8 text-[12px] border-[#e8e8e8] rounded-lg" type="date" {...paymentForm.register("paidAt")} />
-                      <Input className="h-8 text-[12px] border-[#e8e8e8] rounded-lg" type="number" {...paymentForm.register("amount")} placeholder="금액" />
-                    </div>
-                    <div className="flex gap-2">
-                      <Button type="submit" size="sm" disabled={paymentForm.formState.isSubmitting}>
-                        입금 등록
-                      </Button>
-                      <Button type="button" variant="ghost" className="h-7 text-[11px] rounded-lg px-2" onClick={() => { setPaymentBillingId(null); paymentForm.reset(); }}>
-                        취소
-                      </Button>
-                    </div>
-                  </form>
-                ) : (
-                  canManage && billing.paymentStatus !== "PAID" && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-[11px] text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg px-2 w-full"
-                      onClick={() => setPaymentBillingId(billing.id)}
-                    >
-                      <CreditCard size={11} className="mr-1" />
-                      입금 등록
-                    </Button>
-                  )
-                )}
-              </div>
-            </div>
-          ))}
+        <div className="overflow-hidden rounded-xl border border-[#e8e8e8]">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="whitespace-nowrap">청구일자</TableHead>
+                <TableHead className="text-right whitespace-nowrap">청구금액</TableHead>
+                <TableHead className="whitespace-nowrap">입금일자</TableHead>
+                <TableHead className="text-right whitespace-nowrap">입금액</TableHead>
+                <TableHead className="text-right whitespace-nowrap">잔액</TableHead>
+                <TableHead className="whitespace-nowrap">비고</TableHead>
+                <TableHead className="whitespace-nowrap">상태</TableHead>
+                {canManage && <TableHead className="text-right whitespace-nowrap">관리</TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {billings.map((billing) => {
+                const balance = billing.totalAmount - billing.paidAmount;
+                const lastPayment = billing.payments[billing.payments.length - 1];
+                return (
+                  <TableRow key={billing.id}>
+                    <TableCell className="whitespace-nowrap">
+                      {format(new Date(billing.billingDate), "yyyy.MM.dd", { locale: ko })}
+                    </TableCell>
+                    <TableCell className="text-right whitespace-nowrap">{formatKRW(billing.totalAmount)}</TableCell>
+                    <TableCell className="whitespace-nowrap text-[#292d34]">
+                      {lastPayment ? format(new Date(lastPayment.paidAt), "yyyy.MM.dd", { locale: ko }) : "-"}
+                    </TableCell>
+                    <TableCell className="text-right whitespace-nowrap text-deep-violet">{formatKRW(billing.paidAmount)}</TableCell>
+                    <TableCell className={`text-right whitespace-nowrap ${balance > 0 ? "text-rich-plum font-medium" : "text-smoke-gray"}`}>
+                      {formatKRW(balance)}
+                    </TableCell>
+                    <TableCell className="max-w-[160px] truncate text-[#b3b3b3]" title={billing.note ?? ""}>
+                      {billing.note ?? "-"}
+                    </TableCell>
+                    <TableCell>
+                      <PaymentStatusBadge status={billing.paymentStatus as Parameters<typeof PaymentStatusBadge>[0]["status"]} />
+                    </TableCell>
+                    {canManage && (
+                      <TableCell className="text-right whitespace-nowrap">
+                        {billing.paymentStatus !== "PAID" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-[11px] text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg px-2"
+                            onClick={() => setPaymentBillingId(billing.id)}
+                          >
+                            <CreditCard size={11} className="mr-1" />
+                            입금
+                          </Button>
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </div>
+      )}
+
+      {/* 입금 등록 폼 (행 선택 시) */}
+      {paymentBillingId && (
+        <form onSubmit={paymentForm.handleSubmit(submitPayment as any)} className="mt-4 p-4 bg-[#f8f9fb] rounded-xl space-y-3">
+          <p className="text-[13px] font-medium text-[#292d34]">입금 등록</p>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1">
+              <Label className="text-[12px] text-[#b3b3b3]">입금일자</Label>
+              <Input className={INPUT_CLS} type="date" {...paymentForm.register("paidAt")} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[12px] text-[#b3b3b3]">입금액</Label>
+              <Input className={INPUT_CLS} type="number" {...paymentForm.register("amount")} placeholder="0" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[12px] text-[#b3b3b3]">비고</Label>
+              <Input className={INPUT_CLS} {...paymentForm.register("note")} placeholder="선택" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button type="submit" size="sm" disabled={paymentForm.formState.isSubmitting}>입금 등록</Button>
+            <Button type="button" variant="ghost" className="h-8 text-[12px] rounded-lg" onClick={() => { setPaymentBillingId(null); paymentForm.reset(); }}>
+              취소
+            </Button>
+          </div>
+        </form>
       )}
     </Card>
   );

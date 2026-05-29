@@ -43,8 +43,11 @@ export async function GET(req: Request) {
 }
 
 const createSchema = z.object({
+  region: z.string().optional(),
   localGovName: z.string().min(1, "기관명을 입력해주세요"),
   contractNumber: z.string().min(1, "계약번호를 입력해주세요"),
+  department: z.string().optional(),
+  managerName: z.string().optional(),
   deptContact: z.string().optional(),
   contactPhone: z.string().optional(),
   contractName: z.string().min(1, "계약명을 입력해주세요"),
@@ -52,6 +55,7 @@ const createSchema = z.object({
   contractMethod: z.string().optional(),
   commencementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  nextBillingDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   serviceAmount: z.number().min(0),
   billingMethod: z.string().optional(),
   requiredDocs: z.string().optional(),
@@ -89,6 +93,7 @@ export async function POST(req: Request) {
       startDate: new Date(data.startDate),
       commencementDate: data.commencementDate ? new Date(data.commencementDate) : null,
       endDate: new Date(data.endDate),
+      nextBillingDate: data.nextBillingDate ? new Date(data.nextBillingDate) : null,
       merchantFeeType: data.hasMerchantFee ? data.merchantFeeType ?? null : null,
       merchantFeeRate: data.hasMerchantFee && data.merchantFeeRate ? data.merchantFeeRate : null,
       merchantFeeAmount: data.hasMerchantFee && data.merchantFeeAmount ? data.merchantFeeAmount : null,

@@ -63,9 +63,11 @@ interface Props {
 }
 
 const schema = z.object({
+  region: z.string().optional(),
   localGovName: z.string().min(1, "기관명을 입력해주세요"),
   contractNumber: z.string().min(1, "계약번호를 입력해주세요"),
-  deptContact: z.string().optional(),
+  department: z.string().optional(),
+  managerName: z.string().optional(),
   contactPhone: z.string().optional(),
   contractName: z.string().min(1, "계약명을 입력해주세요"),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "날짜 형식이 올바르지 않습니다"),
@@ -74,6 +76,7 @@ const schema = z.object({
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "날짜 형식이 올바르지 않습니다"),
   serviceAmount: z.string().min(1, "계약금액을 입력해주세요"),
   billingMethod: z.string().optional(),
+  nextBillingDate: z.string().optional(),
   billingCycle: billingCycleSchema,
   assigneeId: z.string().min(1, "담당자를 선택해주세요"),
   hasMerchantFee: z.boolean().default(false),
@@ -127,6 +130,8 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...data,
+        nextBillingDate: data.nextBillingDate || undefined,
+        commencementDate: data.commencementDate || undefined,
         serviceAmount: parseFloat(data.serviceAmount),
         merchantFeeRate: data.merchantFeeRate ? parseFloat(data.merchantFeeRate) : undefined,
         merchantFeeAmount: data.merchantFeeAmount ? parseFloat(data.merchantFeeAmount) : undefined,
@@ -146,25 +151,35 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
       <Card className="gap-4">
         <h3 className="font-heading text-section-title">계약 기본 정보</h3>
 
-        {/* 기관명 + 계약번호 */}
+        {/* 계약번호 + 지역 */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="form-field">
-            <Label>기관명</Label>
-            <Input {...register("localGovName")} placeholder="예) 경상남도 거창군청" />
-            {errors.localGovName && <p className="text-caption text-destructive">{errors.localGovName.message}</p>}
-          </div>
           <div className="form-field">
             <Label>계약번호</Label>
             <Input {...register("contractNumber")} placeholder="예) 2024-001" />
             {errors.contractNumber && <p className="text-caption text-destructive">{errors.contractNumber.message}</p>}
           </div>
+          <div className="form-field">
+            <Label>지역</Label>
+            <Input {...register("region")} placeholder="예) 경상남도 거창군" />
+          </div>
         </div>
 
-        {/* 담당부서(담당자) + 연락처 */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* 기관명 */}
+        <div className="form-field">
+          <Label>기관명</Label>
+          <Input {...register("localGovName")} placeholder="예) 경상남도 거창군청" />
+          {errors.localGovName && <p className="text-caption text-destructive">{errors.localGovName.message}</p>}
+        </div>
+
+        {/* 담당부서 + 담당자 + 연락처 */}
+        <div className="grid grid-cols-3 gap-4">
           <div className="form-field">
-            <Label>담당부서(담당자)</Label>
-            <Input {...register("deptContact")} placeholder="예) 재무과 홍길동" />
+            <Label>담당부서</Label>
+            <Input {...register("department")} placeholder="예) 재무과" />
+          </div>
+          <div className="form-field">
+            <Label>담당자</Label>
+            <Input {...register("managerName")} placeholder="예) 홍길동" />
           </div>
           <div className="form-field">
             <Label>연락처</Label>
@@ -243,6 +258,12 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        {/* 다음 청구 예정일 */}
+        <div className="form-field">
+          <Label>다음 청구 예정일</Label>
+          <Input type="date" {...register("nextBillingDate")} />
         </div>
 
         {/* 담당자 (내부 직원) */}

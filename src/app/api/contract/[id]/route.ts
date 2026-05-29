@@ -30,7 +30,10 @@ export async function GET(
 }
 
 const updateSchema = z.object({
+  region: z.string().optional().nullable(),
   localGovName: z.string().min(1).optional(),
+  department: z.string().optional().nullable(),
+  managerName: z.string().optional().nullable(),
   deptContact: z.string().optional().nullable(),
   contactPhone: z.string().optional().nullable(),
   contractName: z.string().min(1).optional(),
@@ -38,6 +41,7 @@ const updateSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   commencementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  nextBillingDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
   serviceAmount: z.number().min(0).optional(),
   billingMethod: z.string().optional().nullable(),
   requiredDocs: z.string().optional().nullable(),
@@ -72,7 +76,10 @@ export async function PUT(
   const updated = await prisma.contract.update({
     where: { id },
     data: {
+      ...(data.region !== undefined && { region: data.region }),
       ...(data.localGovName && { localGovName: data.localGovName }),
+      ...(data.department !== undefined && { department: data.department }),
+      ...(data.managerName !== undefined && { managerName: data.managerName }),
       ...(data.deptContact !== undefined && { deptContact: data.deptContact }),
       ...(data.contactPhone !== undefined && { contactPhone: data.contactPhone }),
       ...(data.contractName && { contractName: data.contractName }),
@@ -82,6 +89,9 @@ export async function PUT(
         commencementDate: data.commencementDate ? new Date(data.commencementDate) : null,
       }),
       ...(data.endDate && { endDate: new Date(data.endDate) }),
+      ...(data.nextBillingDate !== undefined && {
+        nextBillingDate: data.nextBillingDate ? new Date(data.nextBillingDate) : null,
+      }),
       ...(data.serviceAmount !== undefined && { serviceAmount: data.serviceAmount }),
       ...(data.billingMethod !== undefined && { billingMethod: data.billingMethod }),
       ...(data.requiredDocs !== undefined && { requiredDocs: data.requiredDocs }),

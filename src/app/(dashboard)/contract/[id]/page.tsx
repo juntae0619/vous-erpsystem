@@ -91,14 +91,19 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
             <h2 className="text-[18px] font-bold text-[#090c1d] mb-1 tracking-[-0.3px]" style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}>
               {contract.contractName}
             </h2>
-            <p className="text-[13px] text-[#b3b3b3] mb-5">{contract.localGovName} · {contract.contractNumber}</p>
+            <p className="text-[13px] text-[#b3b3b3] mb-5">
+              {contract.region ? `${contract.region} · ` : ""}{contract.localGovName} · {contract.contractNumber}
+            </p>
 
             <div className="grid grid-cols-2 gap-4">
               {[
                 { label: "계약 기간", value: `${format(contract.startDate, "yyyy.MM.dd", { locale: ko })} ~ ${format(contract.endDate, "yyyy.MM.dd", { locale: ko })}` },
                 { label: "서비스 금액", value: formatKRW(Number(contract.serviceAmount)) },
                 { label: "청구 주기", value: BILLING_CYCLE_MAP[contract.billingCycle] },
-                { label: "담당자", value: `${contract.assignee.name}${contract.assignee.position ? ` (${contract.assignee.position})` : ""}` },
+                { label: "다음 청구 예정일", value: contract.nextBillingDate ? format(contract.nextBillingDate, "yyyy.MM.dd", { locale: ko }) : "-" },
+                { label: "기관 담당", value: [contract.department, contract.managerName].filter(Boolean).join(" ") || "-" },
+                { label: "연락처", value: contract.contactPhone ?? "-" },
+                { label: "담당자(내부)", value: `${contract.assignee.name}${contract.assignee.position ? ` (${contract.assignee.position})` : ""}` },
               ].map(({ label, value }) => (
                 <div key={label}>
                   <p className="text-[11px] text-[#b3b3b3] mb-0.5">{label}</p>

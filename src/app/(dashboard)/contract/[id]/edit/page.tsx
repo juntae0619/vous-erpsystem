@@ -27,11 +27,19 @@ export default async function EditContractPage({ params }: { params: Promise<{ i
     toMerchantSettlementCycle(contract.merchantFeeCycle);
 
   const defaultValues: Partial<ContractFormData> = {
+    region: contract.region ?? undefined,
     localGovName: contract.localGovName,
     contractNumber: contract.contractNumber,
+    department: contract.department ?? undefined,
+    managerName: contract.managerName ?? undefined,
+    contactPhone: contract.contactPhone ?? undefined,
     contractName: contract.contractName,
+    contractMethod: contract.contractMethod ?? undefined,
+    billingMethod: contract.billingMethod ?? undefined,
     startDate: format(contract.startDate, "yyyy-MM-dd"),
+    commencementDate: contract.commencementDate ? format(contract.commencementDate, "yyyy-MM-dd") : undefined,
     endDate: format(contract.endDate, "yyyy-MM-dd"),
+    nextBillingDate: contract.nextBillingDate ? format(contract.nextBillingDate, "yyyy-MM-dd") : undefined,
     serviceAmount: String(Number(contract.serviceAmount)),
     billingCycle: contract.billingCycle,
     assigneeId: contract.assigneeId,
