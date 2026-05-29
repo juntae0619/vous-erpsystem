@@ -23,6 +23,15 @@ import {
   type MerchantSettlementCycleValue,
 } from "@/lib/billing-cycle";
 
+const REQUIRED_DOCS = [
+  "선금신청서 외",
+  "보증보험",
+  "전자계산서",
+  "사업자등록증",
+  "통장사본",
+  "완납증명서",
+];
+
 const CONTRACT_METHOD_OPTIONS = [
   { value: "수의계약", label: "수의계약" },
   { value: "일반경쟁", label: "일반경쟁" },
@@ -87,6 +96,19 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
     defaultValues: { billingCycle: "QUARTERLY", ...defaultValues },
   });
 
+  const [checkedDocs, setCheckedDocs] = useState<string[]>(() => {
+    try {
+      const raw = (defaultValues as Record<string, unknown>)?.requiredDocs as string | undefined;
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  });
+
+  function toggleDoc(doc: string) {
+    setCheckedDocs((prev) =>
+      prev.includes(doc) ? prev.filter((d) => d !== doc) : [...prev, doc]
+    );
+  }
+
   const hasMerchantFee = watch("hasMerchantFee");
   const merchantFeeType = watch("merchantFeeType");
 
@@ -102,6 +124,7 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
         serviceAmount: parseFloat(data.serviceAmount),
         merchantFeeRate: data.merchantFeeRate ? parseFloat(data.merchantFeeRate) : undefined,
         merchantFeeAmount: data.merchantFeeAmount ? parseFloat(data.merchantFeeAmount) : undefined,
+        requiredDocs: JSON.stringify(checkedDocs),
       }),
     });
     const json = await res.json();
@@ -285,6 +308,24 @@ export function ContractForm({ assignees, defaultValues, contractId }: Props) {
             </div>
           </div>
         )}
+      </Card>
+
+      {/* 청구 시 필요서류 */}
+      <Card className="gap-4">
+        <h3 className="font-heading text-section-title">청구 시 필요서류</h3>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {REQUIRED_DOCS.map((item) => (
+            <label key={item} className="flex items-center gap-2 cursor-pointer text-body-sm text-midnight-charcoal">
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-deep-violet"
+                checked={checkedDocs.includes(item)}
+                onChange={() => toggleDoc(item)}
+              />
+              {item}
+            </label>
+          ))}
+        </div>
       </Card>
 
       {/* 비고 */}

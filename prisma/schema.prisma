@@ -296,6 +296,7 @@ model Contract {
   endDate           DateTime         @db.Date  // 완수일
   serviceAmount     Decimal          @db.Decimal(15, 0)
   billingMethod     String?          // 청구방법 (정률/정액)
+  requiredDocs      String?          // 청구 시 필요서류 (JSON 배열)
   billingCycle      BillingCycle
   assigneeId        String
   contractFileUrl   String?

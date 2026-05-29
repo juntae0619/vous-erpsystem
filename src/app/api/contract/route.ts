@@ -54,6 +54,7 @@ const createSchema = z.object({
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   serviceAmount: z.number().min(0),
   billingMethod: z.string().optional(),
+  requiredDocs: z.string().optional(),
   billingCycle: billingCycleSchema,
   assigneeId: z.string().min(1),
   hasMerchantFee: z.boolean().default(false),
