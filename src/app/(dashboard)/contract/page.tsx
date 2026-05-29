@@ -128,7 +128,12 @@ export default async function ContractPage({
                 className="h-9 w-full rounded-lg border border-border pl-9 pr-3 text-body-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
-            <label className="flex items-center gap-2 text-body-sm text-smoke-gray">
+            <label className={cn(
+              "flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-body-sm font-medium transition-colors",
+              onlyUnpaid
+                ? "border-deep-violet bg-deep-violet text-white"
+                : "border-border bg-white text-midnight-charcoal hover:border-deep-violet hover:text-deep-violet"
+            )}>
               <input
                 type="checkbox"
                 name="unpaid"
