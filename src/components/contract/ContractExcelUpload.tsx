@@ -180,7 +180,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
             <div key={s.key} className="flex items-center gap-1">
               {i > 0 && <ChevronRight size={12} className="text-[#d0d0d0]" />}
               <span
-                className={`text-[12px] font-medium px-2 py-0.5 rounded-md ${
+                className={`text-caption font-medium px-2 py-0.5 rounded-md ${
                   step === s.key
                     ? "bg-[#7b68ee] text-white"
                     : "text-[#b3b3b3]"
@@ -201,17 +201,17 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
               {/* 템플릿 다운로드 안내 */}
               <div className="flex items-center justify-between p-3.5 bg-[#f8f9fb] rounded-xl border border-[#e8e8e8]">
                 <div>
-                  <p className="text-[13px] font-medium text-[#292d34]">
+                  <p className="text-body-sm font-medium text-[#292d34]">
                     먼저 템플릿을 내려받으세요
                   </p>
-                  <p className="text-[12px] text-[#b3b3b3] mt-0.5">
+                  <p className="text-caption text-[#b3b3b3] mt-0.5">
                     헤더 형식을 변경하지 말고 데이터만 입력해주세요
                   </p>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 text-[12px] border border-[#e8e8e8] rounded-lg px-3 gap-1.5 hover:bg-white"
+                  className="h-8 text-caption border border-[#e8e8e8] rounded-lg px-3 gap-1.5 hover:bg-white"
                   onClick={downloadTemplate}
                 >
                   <Download size={13} />
@@ -239,10 +239,10 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
                   className={isDragging ? "text-[#7b68ee]" : "text-[#d0d0d0]"}
                 />
                 <div className="text-center">
-                  <p className="text-[13px] font-medium text-[#292d34]">
+                  <p className="text-body-sm font-medium text-[#292d34]">
                     파일을 여기에 끌어다 놓거나 클릭하세요
                   </p>
-                  <p className="text-[12px] text-[#b3b3b3] mt-0.5">.xlsx 또는 .xls</p>
+                  <p className="text-caption text-[#b3b3b3] mt-0.5">.xlsx 또는 .xls</p>
                 </div>
                 <input
                   ref={inputRef}
@@ -254,7 +254,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
               </div>
 
               {loading && (
-                <p className="text-center text-[13px] text-[#7b68ee]">
+                <p className="text-center text-body-sm text-[#7b68ee]">
                   파일 검증 중…
                 </p>
               )}
@@ -267,19 +267,19 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
               {/* 요약 */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="p-3 bg-[#f8f9fb] rounded-xl text-center">
-                  <p className="text-[11px] text-[#b3b3b3]">전체</p>
+                  <p className="text-caption text-[#b3b3b3]">전체</p>
                   <p className="text-[18px] font-bold text-[#090c1d]">
                     {preview.rows.length}건
                   </p>
                 </div>
                 <div className="p-3 bg-green-50 rounded-xl text-center">
-                  <p className="text-[11px] text-green-600">등록 가능</p>
+                  <p className="text-caption text-green-600">등록 가능</p>
                   <p className="text-[18px] font-bold text-green-700">
                     {preview.validCount}건
                   </p>
                 </div>
                 <div className={`p-3 rounded-xl text-center ${preview.invalidCount > 0 ? "bg-red-50" : "bg-[#f8f9fb]"}`}>
-                  <p className={`text-[11px] ${preview.invalidCount > 0 ? "text-red-500" : "text-[#b3b3b3]"}`}>
+                  <p className={`text-caption ${preview.invalidCount > 0 ? "text-red-500" : "text-[#b3b3b3]"}`}>
                     오류
                   </p>
                   <p className={`text-[18px] font-bold ${preview.invalidCount > 0 ? "text-red-600" : "text-[#b3b3b3]"}`}>
@@ -289,7 +289,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
               </div>
 
               {/* 파일명 */}
-              <div className="flex items-center gap-2 text-[12px] text-[#b3b3b3]">
+              <div className="flex items-center gap-2 text-caption text-[#b3b3b3]">
                 <FileSpreadsheet size={13} />
                 {fileName}
                 <button
@@ -318,8 +318,8 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] text-[#b3b3b3]">{r.rowIndex}행</span>
-                        <span className="text-[12px] font-medium text-[#292d34] truncate">
+                        <span className="text-caption text-[#b3b3b3]">{r.rowIndex}행</span>
+                        <span className="text-caption font-medium text-[#292d34] truncate">
                           {r.contractNumber || "(계약번호 없음)"}
                         </span>
                         {r.valid && (
@@ -331,7 +331,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
                       {!r.valid && r.errors.length > 0 && (
                         <ul className="mt-1 space-y-0.5">
                           {r.errors.map((e, i) => (
-                            <li key={i} className="text-[11px] text-red-500 flex items-center gap-1">
+                            <li key={i} className="text-caption text-red-500 flex items-center gap-1">
                               <span className="w-1 h-1 rounded-full bg-red-400 shrink-0" />
                               {e}
                             </li>
@@ -346,7 +346,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
               {preview.invalidCount > 0 && (
                 <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-xl border border-amber-100">
                   <AlertTriangle size={14} className="text-amber-500 shrink-0" />
-                  <p className="text-[12px] text-amber-700">
+                  <p className="text-caption text-amber-700">
                     오류가 있는 {preview.invalidCount}건은 건너뜁니다. 유효한 {preview.validCount}건만 등록됩니다.
                   </p>
                 </div>
@@ -366,7 +366,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
                   {importResult.created}건 등록 완료
                 </p>
                 {importResult.skipped > 0 && (
-                  <p className="text-[13px] text-[#b3b3b3] mt-1">
+                  <p className="text-body-sm text-[#b3b3b3] mt-1">
                     {importResult.skipped}건 건너뜀
                   </p>
                 )}
@@ -374,18 +374,18 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
 
               {importResult.errors.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-[12px] font-medium text-[#292d34]">건너뛴 항목</p>
+                  <p className="text-caption font-medium text-[#292d34]">건너뛴 항목</p>
                   {importResult.errors.map((e) => (
                     <div
                       key={e.rowIndex}
                       className="p-3 bg-red-50 rounded-xl border border-red-100"
                     >
-                      <p className="text-[12px] font-medium text-red-700">
+                      <p className="text-caption font-medium text-red-700">
                         {e.rowIndex}행 {e.contractNumber && `(${e.contractNumber})`}
                       </p>
                       <ul className="mt-1">
                         {e.errors.map((msg, i) => (
-                          <li key={i} className="text-[11px] text-red-500">· {msg}</li>
+                          <li key={i} className="text-caption text-red-500">· {msg}</li>
                         ))}
                       </ul>
                     </div>
@@ -401,7 +401,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
           {step === "upload" && (
             <Button
               variant="ghost"
-              className="h-8 text-[13px] rounded-lg"
+              className="h-8 text-body-sm rounded-lg"
               onClick={onClose}
             >
               취소
@@ -412,7 +412,7 @@ export function ContractExcelUpload({ onClose }: { onClose: () => void }) {
             <>
               <Button
                 variant="ghost"
-                className="h-8 text-[13px] rounded-lg"
+                className="h-8 text-body-sm rounded-lg"
                 onClick={onClose}
               >
                 취소

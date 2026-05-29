@@ -43,8 +43,8 @@ interface UserFormProps {
   defaultValues?: Partial<CreateForm>;
 }
 
-const LABEL_CLS = "text-[13px] font-medium text-[#292d34]";
-const INPUT_CLS = "h-9 text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
+const LABEL_CLS = "text-body-sm font-medium text-[#292d34]";
+const INPUT_CLS = "h-9 text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
 
 export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
   const router = useRouter();
@@ -101,7 +101,7 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
           <div className="space-y-1.5">
             <Label className={LABEL_CLS}>이름 *</Label>
             <Input className={INPUT_CLS} placeholder="홍길동" {...register("name")} />
-            {errors.name && <p className="text-[12px] text-destructive">{errors.name.message}</p>}
+            {errors.name && <p className="text-caption text-destructive">{errors.name.message}</p>}
           </div>
 
           {/* 이메일 */}
@@ -114,7 +114,7 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
               disabled={mode === "edit"}
               {...register("email")}
             />
-            {errors.email && <p className="text-[12px] text-destructive">{errors.email.message}</p>}
+            {errors.email && <p className="text-caption text-destructive">{errors.email.message}</p>}
           </div>
 
           {/* 비밀번호 (생성 시만) */}
@@ -128,7 +128,7 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
                 {...register("password")}
               />
               {(errors as any).password && (
-                <p className="text-[12px] text-destructive">{(errors as any).password.message}</p>
+                <p className="text-caption text-destructive">{(errors as any).password.message}</p>
               )}
             </div>
           )}
@@ -183,7 +183,7 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          className="flex-1 h-9 border-[#e8e8e8] text-[#292d34] rounded-lg text-[13px]"
+          className="flex-1 h-9 border-[#e8e8e8] text-[#292d34] rounded-lg text-body-sm"
         >
           취소
         </Button>

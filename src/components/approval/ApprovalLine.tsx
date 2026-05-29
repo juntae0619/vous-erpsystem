@@ -47,7 +47,7 @@ export function ApprovalLine({ steps }: Props) {
                 {config.icon}
               </div>
               <div className="text-center">
-                <p className="text-[11px] font-medium text-[#292d34]">
+                <p className="text-caption font-medium text-[#292d34]">
                   {step.approver?.name ?? ROLE_MAP[step.stepRole] ?? step.stepRole}
                 </p>
                 <p className="text-[10px] text-[#b3b3b3]">

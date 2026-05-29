@@ -70,14 +70,14 @@ export function UserActionButtons({ userId, isActive }: UserActionButtonsProps) 
       <DropdownMenuContent align="end" className="w-44 rounded-xl border-[#e8e8e8] shadow-card">
         <DropdownMenuItem
           onClick={() => (window.location.href = `/users/${userId}`)}
-          className="flex items-center gap-2 text-[13px] cursor-pointer rounded-lg"
+          className="flex items-center gap-2 text-body-sm cursor-pointer rounded-lg"
         >
           <Pencil size={13} className="text-[#b3b3b3]" />
           정보 수정
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={resetPassword}
-          className="flex items-center gap-2 text-[13px] cursor-pointer rounded-lg"
+          className="flex items-center gap-2 text-body-sm cursor-pointer rounded-lg"
         >
           <KeyRound size={13} className="text-[#b3b3b3]" />
           비밀번호 초기화
@@ -85,7 +85,7 @@ export function UserActionButtons({ userId, isActive }: UserActionButtonsProps) 
         <DropdownMenuSeparator className="bg-[#e8e8e8]" />
         <DropdownMenuItem
           onClick={toggleActive}
-          className={`flex items-center gap-2 text-[13px] cursor-pointer rounded-lg ${
+          className={`flex items-center gap-2 text-body-sm cursor-pointer rounded-lg ${
             isActive ? "text-red-500" : "text-green-600"
           }`}
         >

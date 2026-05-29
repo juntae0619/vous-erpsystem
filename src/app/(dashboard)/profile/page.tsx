@@ -50,15 +50,15 @@ export default async function ProfilePage() {
                 >
                   {user.name}
                 </h2>
-                <p className="text-[13px] text-[#b3b3b3]">{user.position} · {user.team}</p>
+                <p className="text-body-sm text-[#b3b3b3]">{user.position} · {user.team}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               {fields.map(({ label, value }) => (
                 <div key={label}>
-                  <p className="text-[11px] text-[#b3b3b3] mb-1">{label}</p>
-                  <p className="text-[13px] font-medium text-[#292d34]">{value}</p>
+                  <p className="text-caption text-[#b3b3b3] mb-1">{label}</p>
+                  <p className="text-body-sm font-medium text-[#292d34]">{value}</p>
                 </div>
               ))}
             </div>

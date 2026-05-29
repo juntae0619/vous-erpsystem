@@ -111,6 +111,4 @@ export {
   TableFooter,
   TableHead,
   TableRow,
-  TableCell,
-  TableCaption,
-}
+  

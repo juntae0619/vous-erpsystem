@@ -45,8 +45,8 @@ interface Props {
   canManage: boolean;
 }
 
-const LABEL_CLS = "text-[13px] font-medium text-[#292d34]";
-const INPUT_CLS = "h-9 text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
+const LABEL_CLS = "text-body-sm font-medium text-[#292d34]";
+const INPUT_CLS = "h-9 text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
 
 const billingSchema = z.object({
   billingDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -122,7 +122,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 text-[12px] text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg px-2"
+            className="h-7 text-caption text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg px-2"
             onClick={() => setShowBillingForm(true)}
           >
             <Plus size={12} className="mr-1" />
@@ -134,24 +134,24 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
       {/* 청구 등록 폼 */}
       {showBillingForm && (
         <form onSubmit={billingForm.handleSubmit(submitBilling as any)} className="p-4 bg-[#f8f9fb] rounded-xl mb-4 space-y-3">
-          <p className="text-[13px] font-medium text-[#292d34]">청구 추가</p>
+          <p className="text-body-sm font-medium text-[#292d34]">청구 추가</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-[12px] text-[#b3b3b3]">청구일</Label>
+              <Label className="text-caption text-[#b3b3b3]">청구일</Label>
               <Input className={INPUT_CLS} type="date" {...billingForm.register("billingDate")} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] text-[#b3b3b3]">납부기한</Label>
+              <Label className="text-caption text-[#b3b3b3]">납부기한</Label>
               <Input className={INPUT_CLS} type="date" {...billingForm.register("dueDate")} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-[12px] text-[#b3b3b3]">서비스 금액</Label>
+              <Label className="text-caption text-[#b3b3b3]">서비스 금액</Label>
               <Input className={INPUT_CLS} type="number" {...billingForm.register("serviceAmount")} placeholder="0" />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] text-[#b3b3b3]">가맹점 수수료</Label>
+              <Label className="text-caption text-[#b3b3b3]">가맹점 수수료</Label>
               <Input className={INPUT_CLS} type="number" {...billingForm.register("merchantFeeAmt")} placeholder="0" />
             </div>
           </div>
@@ -159,7 +159,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
             <Button type="submit" size="sm" disabled={billingForm.formState.isSubmitting}>
               추가
             </Button>
-            <Button type="button" variant="ghost" className="h-8 text-[12px] rounded-lg" onClick={() => { setShowBillingForm(false); billingForm.reset(); }}>
+            <Button type="button" variant="ghost" className="h-8 text-caption rounded-lg" onClick={() => { setShowBillingForm(false); billingForm.reset(); }}>
               취소
             </Button>
           </div>
@@ -167,7 +167,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
       )}
 
       {billings.length === 0 ? (
-        <p className="text-[13px] text-[#b3b3b3] text-center py-4">수금 내역이 없습니다</p>
+        <p className="text-body-sm text-[#b3b3b3] text-center py-4">수금 내역이 없습니다</p>
       ) : (
         <div className="overflow-hidden rounded-xl border border-[#e8e8e8]">
           <Table>
@@ -212,7 +212,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 text-[11px] text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg px-2"
+                            className="h-7 text-caption text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg px-2"
                             onClick={() => setPaymentBillingId(billing.id)}
                           >
                             <CreditCard size={11} className="mr-1" />
@@ -232,24 +232,24 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
       {/* 입금 등록 폼 (행 선택 시) */}
       {paymentBillingId && (
         <form onSubmit={paymentForm.handleSubmit(submitPayment as any)} className="mt-4 p-4 bg-[#f8f9fb] rounded-xl space-y-3">
-          <p className="text-[13px] font-medium text-[#292d34]">입금 등록</p>
+          <p className="text-body-sm font-medium text-[#292d34]">입금 등록</p>
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1">
-              <Label className="text-[12px] text-[#b3b3b3]">입금일자</Label>
+              <Label className="text-caption text-[#b3b3b3]">입금일자</Label>
               <Input className={INPUT_CLS} type="date" {...paymentForm.register("paidAt")} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] text-[#b3b3b3]">입금액</Label>
+              <Label className="text-caption text-[#b3b3b3]">입금액</Label>
               <Input className={INPUT_CLS} type="number" {...paymentForm.register("amount")} placeholder="0" />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] text-[#b3b3b3]">비고</Label>
+              <Label className="text-caption text-[#b3b3b3]">비고</Label>
               <Input className={INPUT_CLS} {...paymentForm.register("note")} placeholder="선택" />
             </div>
           </div>
           <div className="flex gap-2">
             <Button type="submit" size="sm" disabled={paymentForm.formState.isSubmitting}>입금 등록</Button>
-            <Button type="button" variant="ghost" className="h-8 text-[12px] rounded-lg" onClick={() => { setPaymentBillingId(null); paymentForm.reset(); }}>
+            <Button type="button" variant="ghost" className="h-8 text-caption rounded-lg" onClick={() => { setPaymentBillingId(null); paymentForm.reset(); }}>
               취소
             </Button>
           </div>

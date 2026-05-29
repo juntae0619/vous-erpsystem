@@ -22,8 +22,8 @@ const schema = z
 
 type FormData = z.infer<typeof schema>;
 
-const LABEL_CLS = "text-[13px] font-medium text-[#292d34]";
-const INPUT_CLS = "h-9 text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
+const LABEL_CLS = "text-body-sm font-medium text-[#292d34]";
+const INPUT_CLS = "h-9 text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
 
 export function PasswordChangeForm() {
   const {
@@ -61,21 +61,21 @@ export function PasswordChangeForm() {
           <Label className={LABEL_CLS}>현재 비밀번호</Label>
           <Input className={INPUT_CLS} type="password" {...register("currentPassword")} />
           {errors.currentPassword && (
-            <p className="text-[12px] text-destructive">{errors.currentPassword.message}</p>
+            <p className="text-caption text-destructive">{errors.currentPassword.message}</p>
           )}
         </div>
         <div className="space-y-1.5">
           <Label className={LABEL_CLS}>새 비밀번호</Label>
           <Input className={INPUT_CLS} type="password" placeholder="8자 이상" {...register("newPassword")} />
           {errors.newPassword && (
-            <p className="text-[12px] text-destructive">{errors.newPassword.message}</p>
+            <p className="text-caption text-destructive">{errors.newPassword.message}</p>
           )}
         </div>
         <div className="space-y-1.5">
           <Label className={LABEL_CLS}>새 비밀번호 확인</Label>
           <Input className={INPUT_CLS} type="password" {...register("confirmPassword")} />
           {errors.confirmPassword && (
-            <p className="text-[12px] text-destructive">{errors.confirmPassword.message}</p>
+            <p className="text-caption text-destructive">{errors.confirmPassword.message}</p>
           )}
         </div>
         <Button

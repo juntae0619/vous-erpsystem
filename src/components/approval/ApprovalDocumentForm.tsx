@@ -58,8 +58,8 @@ interface ApprovalLineItem {
   approverId?: string;
 }
 
-const LABEL_CLS = "text-[13px] font-medium text-[#292d34]";
-const INPUT_CLS = "h-9 text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
+const LABEL_CLS = "text-body-sm font-medium text-[#292d34]";
+const INPUT_CLS = "h-9 text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee]";
 
 export function ApprovalDocumentForm({ approvers }: Props) {
   const router = useRouter();
@@ -140,7 +140,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
             </SelectTrigger>
             <SelectContent className="rounded-xl border-[#e8e8e8]">
               {DOC_TYPE_OPTIONS.map((o) => (
-                <SelectItem key={o.value} value={o.value} className="text-[13px]">{o.label}</SelectItem>
+                <SelectItem key={o.value} value={o.value} className="text-body-sm">{o.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -149,7 +149,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
         <div className="space-y-1.5">
           <Label className={LABEL_CLS}>제목</Label>
           <Input className={INPUT_CLS} {...register("title")} placeholder="결재 문서 제목" />
-          {errors.title && <p className="text-[12px] text-destructive">{errors.title.message}</p>}
+          {errors.title && <p className="text-caption text-destructive">{errors.title.message}</p>}
         </div>
 
         <div className="space-y-1.5">
@@ -157,9 +157,9 @@ export function ApprovalDocumentForm({ approvers }: Props) {
           <Textarea
             {...register("content")}
             placeholder="결재 내용을 입력하세요"
-            className="text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[150px]"
+            className="text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[150px]"
           />
-          {errors.content && <p className="text-[12px] text-destructive">{errors.content.message}</p>}
+          {errors.content && <p className="text-caption text-destructive">{errors.content.message}</p>}
         </div>
 
         {/* 지출결의서 추가 필드 */}
@@ -179,7 +179,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
               <Textarea
                 {...register("expenseItems")}
                 placeholder="항목명 / 금액 형태로 입력하세요&#10;예) 교통비 / 50,000원"
-                className="text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[80px]"
+                className="text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[80px]"
               />
             </div>
           </>
@@ -197,7 +197,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
               type="button"
               variant="ghost"
               size="sm"
-              className="h-7 text-[12px] text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg px-2"
+              className="h-7 text-caption text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg px-2"
               onClick={addStep}
             >
               <Plus size={12} className="mr-1" />
@@ -209,7 +209,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
         <div className="space-y-3">
           {approvalLine.map((item, idx) => (
             <div key={idx} className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#edf6fd] text-[#7b68ee] text-[11px] font-bold shrink-0">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#edf6fd] text-[#7b68ee] text-caption font-bold shrink-0">
                 {idx + 1}
               </div>
 
@@ -217,12 +217,12 @@ export function ApprovalDocumentForm({ approvers }: Props) {
                 value={item.role}
                 onValueChange={(v) => updateLine(idx, { role: v as ApprovalLineItem["role"] })}
               >
-                <SelectTrigger className="h-9 w-28 text-[13px] border-[#e8e8e8] rounded-lg">
+                <SelectTrigger className="h-9 w-28 text-body-sm border-[#e8e8e8] rounded-lg">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-[#e8e8e8]">
                   {STEP_ROLE_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value} className="text-[13px]">{o.label}</SelectItem>
+                    <SelectItem key={o.value} value={o.value} className="text-body-sm">{o.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -231,7 +231,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
                 value={item.approverId ?? ""}
                 onValueChange={(v) => updateLine(idx, { approverId: v || undefined })}
               >
-                <SelectTrigger className="flex-1 h-9 text-[13px] border-[#e8e8e8] rounded-lg">
+                <SelectTrigger className="flex-1 h-9 text-body-sm border-[#e8e8e8] rounded-lg">
                   <SelectValue placeholder="결재자 선택 (선택)" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-[#e8e8e8]">
@@ -242,7 +242,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
                       return a.role === "ADMIN";
                     })
                     .map((a) => (
-                      <SelectItem key={a.id} value={a.id} className="text-[13px]">
+                      <SelectItem key={a.id} value={a.id} className="text-body-sm">
                         {a.name} {a.position ? `(${a.position})` : ""}
                       </SelectItem>
                     ))}
@@ -270,7 +270,7 @@ export function ApprovalDocumentForm({ approvers }: Props) {
         <Button
           type="button"
           variant="outline"
-          className="flex-1 h-9 text-[13px] border-[#e8e8e8] rounded-lg text-[#292d34]"
+          className="flex-1 h-9 text-body-sm border-[#e8e8e8] rounded-lg text-[#292d34]"
           disabled={submitting}
           onClick={handleSubmit((data) => submit(data, true))}
         >

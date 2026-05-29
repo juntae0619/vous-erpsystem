@@ -92,7 +92,7 @@ export default async function AttendancePage() {
             {isManager && (
               <Card className="overflow-hidden p-0 shadow-card border-[#e8e8e8] rounded-xl">
                 <div className="bg-[#2c3e6b] px-5 py-3">
-                  <h3 className="text-[14px] font-semibold text-white tracking-[-0.15px]">
+                  <h3 className="text-body-sm font-semibold text-white tracking-[-0.15px]">
                     전 직원 오늘 현황
                   </h3>
                 </div>
@@ -110,28 +110,28 @@ export default async function AttendancePage() {
                         className="flex items-center justify-between py-1.5"
                       >
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-[#e9ebf0] flex items-center justify-center text-[11px] font-semibold text-[#292d34]">
+                          <div className="w-7 h-7 rounded-full bg-[#e9ebf0] flex items-center justify-center text-caption font-semibold text-[#292d34]">
                             {u.name[0]}
                           </div>
                           <div>
-                            <p className="text-[13px] font-medium text-[#292d34]">{u.name}</p>
-                            <p className="text-[11px] text-[#b3b3b3]">{u.team}</p>
+                            <p className="text-body-sm font-medium text-[#292d34]">{u.name}</p>
+                            <p className="text-caption text-[#b3b3b3]">{u.team}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {att?.checkIn && (
-                            <span className="text-[11px] text-[#b3b3b3]">
+                            <span className="text-caption text-[#b3b3b3]">
                               {formatTime(att.checkIn)}
                             </span>
                           )}
                           {statusInfo ? (
                             <Badge
-                              className={`text-[11px] px-2 py-0.5 rounded-full border-0 font-medium ${statusInfo.bg} ${statusInfo.color}`}
+                              className={`text-caption px-2 py-0.5 rounded-full border-0 font-medium ${statusInfo.bg} ${statusInfo.color}`}
                             >
                               {statusInfo.label}
                             </Badge>
                           ) : (
-                            <Badge className="text-[11px] px-2 py-0.5 rounded-full border-0 font-medium bg-[#e9ebf0] text-[#b3b3b3]">
+                            <Badge className="text-caption px-2 py-0.5 rounded-full border-0 font-medium bg-[#e9ebf0] text-[#b3b3b3]">
                               미출근
                             </Badge>
                           )}
@@ -147,8 +147,4 @@ export default async function AttendancePage() {
 
           {/* 월별 달력 */}
           <AttendanceCalendar />
-        </div>
-      </div>
-    </div>
-  );
-}
+ 

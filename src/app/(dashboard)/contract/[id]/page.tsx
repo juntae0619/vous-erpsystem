@@ -83,7 +83,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
           <Card className="p-5 shadow-card border-[#e8e8e8] rounded-xl">
             <div className="flex items-start justify-between gap-3 mb-4">
               <ContractStatusBadge status={contract.status as import("@/components/contract/ContractStatusBadge").ContractStatus} />
-              <p className="text-[11px] text-[#b3b3b3]">
+              <p className="text-caption text-[#b3b3b3]">
                 등록: {format(contract.createdAt, "yyyy.MM.dd", { locale: ko })}
               </p>
             </div>
@@ -91,7 +91,7 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
             <h2 className="text-[18px] font-bold text-[#090c1d] mb-1 tracking-[-0.3px]" style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}>
               {contract.contractName}
             </h2>
-            <p className="text-[13px] text-[#b3b3b3] mb-5">
+            <p className="text-body-sm text-[#b3b3b3] mb-5">
               {contract.region ? `${contract.region} · ` : ""}{contract.localGovName} · {contract.contractNumber}
             </p>
 
@@ -106,8 +106,8 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
                 { label: "담당자(내부)", value: `${contract.assignee.name}${contract.assignee.position ? ` (${contract.assignee.position})` : ""}` },
               ].map(({ label, value }) => (
                 <div key={label}>
-                  <p className="text-[11px] text-[#b3b3b3] mb-0.5">{label}</p>
-                  <p className="text-[13px] font-medium text-[#292d34]">{value}</p>
+                  <p className="text-caption text-[#b3b3b3] mb-0.5">{label}</p>
+                  <p className="text-body-sm font-medium text-[#292d34]">{value}</p>
                 </div>
               ))}
             </div>
@@ -115,17 +115,17 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
             {/* 가맹점 수수료 */}
             {contract.hasMerchantFee && (
               <div className="mt-4 p-3 bg-[#f8f9fb] rounded-xl">
-                <p className="text-[11px] text-[#b3b3b3] mb-2">가맹점 수수료</p>
+                <p className="text-caption text-[#b3b3b3] mb-2">가맹점 수수료</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-[11px] text-[#b3b3b3]">유형</p>
-                    <p className="text-[13px] font-medium text-[#292d34]">
+                    <p className="text-caption text-[#b3b3b3]">유형</p>
+                    <p className="text-body-sm font-medium text-[#292d34]">
                       {FEE_TYPE_MAP[contract.merchantFeeType ?? ""] ?? "-"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] text-[#b3b3b3]">금액/율</p>
-                    <p className="text-[13px] font-medium text-[#292d34]">
+                    <p className="text-caption text-[#b3b3b3]">금액/율</p>
+                    <p className="text-body-sm font-medium text-[#292d34]">
                       {contract.merchantFeeType === "RATE"
                         ? `${contract.merchantFeeRate}%`
                         : formatKRW(Number(contract.merchantFeeAmount))}
@@ -133,8 +133,8 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
                   </div>
                   {contract.merchantFeeCycle && (
                     <div>
-                      <p className="text-[11px] text-[#b3b3b3]">가맹점 정산 주기</p>
-                      <p className="text-[13px] font-medium text-[#292d34]">
+                      <p className="text-caption text-[#b3b3b3]">가맹점 정산 주기</p>
+                      <p className="text-body-sm font-medium text-[#292d34]">
                         {BILLING_CYCLE_MAP[contract.merchantFeeCycle]}
                       </p>
                     </div>
@@ -145,8 +145,8 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
 
             {contract.note && (
               <div className="mt-4 p-3 bg-[#f8f9fb] rounded-xl">
-                <p className="text-[11px] text-[#b3b3b3] mb-1">비고</p>
-                <p className="text-[13px] text-[#292d34]">{contract.note}</p>
+                <p className="text-caption text-[#b3b3b3] mb-1">비고</p>
+                <p className="text-body-sm text-[#292d34]">{contract.note}</p>
               </div>
             )}
           </Card>

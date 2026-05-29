@@ -79,19 +79,19 @@ export function CheckInOutButton({ initialRecord, onUpdate }: CheckInOutButtonPr
           </div>
           <div>
             <p
-              className="text-[14px] font-semibold text-[#090c1d] tracking-[-0.15px]"
+              className="text-body-sm font-semibold text-[#090c1d] tracking-[-0.15px]"
               style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
             >
               오늘 근태
             </p>
-            <p className="text-[12px] text-[#b3b3b3]">
+            <p className="text-caption text-[#b3b3b3]">
               {format(now, "yyyy년 M월 d일 (EEE)", { locale: ko })}
             </p>
           </div>
         </div>
         {statusInfo && (
           <Badge
-            className={`text-[11px] px-2.5 py-1 rounded-full font-medium border-0 ${statusInfo.bg} ${statusInfo.color}`}
+            className={`text-caption px-2.5 py-1 rounded-full font-medium border-0 ${statusInfo.bg} ${statusInfo.color}`}
           >
             {statusInfo.label}
           </Badge>
@@ -101,7 +101,7 @@ export function CheckInOutButton({ initialRecord, onUpdate }: CheckInOutButtonPr
       {/* 출퇴근 시간 표시 */}
       <div className="flex gap-4 mb-4">
         <div className="flex-1 bg-[#e9ebf0] rounded-lg p-3 text-center">
-          <p className="text-[11px] text-[#b3b3b3] mb-1">출근</p>
+          <p className="text-caption text-[#b3b3b3] mb-1">출근</p>
           <p
             className="text-[20px] font-bold text-[#090c1d] tracking-[-0.5px]"
             style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
@@ -110,7 +110,7 @@ export function CheckInOutButton({ initialRecord, onUpdate }: CheckInOutButtonPr
           </p>
         </div>
         <div className="flex-1 bg-[#e9ebf0] rounded-lg p-3 text-center">
-          <p className="text-[11px] text-[#b3b3b3] mb-1">퇴근</p>
+          <p className="text-caption text-[#b3b3b3] mb-1">퇴근</p>
           <p
             className="text-[20px] font-bold text-[#090c1d] tracking-[-0.5px]"
             style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
@@ -119,7 +119,7 @@ export function CheckInOutButton({ initialRecord, onUpdate }: CheckInOutButtonPr
           </p>
         </div>
         <div className="flex-1 bg-[#e9ebf0] rounded-lg p-3 text-center">
-          <p className="text-[11px] text-[#b3b3b3] mb-1">근무시간</p>
+          <p className="text-caption text-[#b3b3b3] mb-1">근무시간</p>
           <p
             className="text-[16px] font-bold text-[#090c1d] tracking-[-0.5px]"
             style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
@@ -143,7 +143,7 @@ export function CheckInOutButton({ initialRecord, onUpdate }: CheckInOutButtonPr
           onClick={handleCheckOut}
           disabled={loading || !record?.checkIn || !!record?.checkOut}
           variant="outline"
-          className="flex-1 h-10 border-[#e8e8e8] text-[#292d34] hover:bg-[#e9ebf0] text-[13px] font-medium rounded-lg gap-2 disabled:opacity-40"
+          className="flex-1 h-10 border-[#e8e8e8] text-[#292d34] hover:bg-[#e9ebf0] text-body-sm font-medium rounded-lg gap-2 disabled:opacity-40"
         >
           <LogOut size={14} />
           퇴근
@@ -151,7 +151,7 @@ export function CheckInOutButton({ initialRecord, onUpdate }: CheckInOutButtonPr
       </div>
 
       {!record?.checkIn && (
-        <p className="flex items-center gap-1.5 text-[12px] text-[#b3b3b3] mt-3">
+        <p className="flex items-center gap-1.5 text-caption text-[#b3b3b3] mt-3">
           <AlertCircle size={12} />
           출근 버튼을 눌러 오늘 근무를 시작하세요
         </p>

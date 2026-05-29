@@ -45,22 +45,4 @@ export default async function EditContractPage({ params }: { params: Promise<{ i
     assigneeId: contract.assigneeId,
     hasMerchantFee: contract.hasMerchantFee,
     merchantFeeType: contract.merchantFeeType ?? undefined,
-    merchantFeeRate: contract.merchantFeeRate ? String(Number(contract.merchantFeeRate)) : undefined,
-    merchantFeeAmount: contract.merchantFeeAmount ? String(Number(contract.merchantFeeAmount)) : undefined,
-    merchantFeeCycle,
-    note: contract.note ?? undefined,
-  };
-
-  return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <Header title="계약 수정" showBack />
-      <div className="flex-1 overflow-y-auto p-6">
-        <ContractForm
-          assignees={assignees}
-          defaultValues={defaultValues}
-          contractId={id}
-        />
-      </div>
-    </div>
-  );
-}
+    merchantFeeRate: contract.merchantFeeRate ? String(Number(contract.merch

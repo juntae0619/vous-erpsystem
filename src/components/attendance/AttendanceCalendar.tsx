@@ -116,7 +116,7 @@ export function AttendanceCalendar({ userId }: AttendanceCalendarProps) {
           {["일", "월", "화", "수", "목", "금", "토"].map((d, i) => (
             <div
               key={d}
-              className={`text-center text-[11px] font-medium py-1 ${
+              className={`text-center text-caption font-medium py-1 ${
                 i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-[#b3b3b3]"
               }`}
             >
@@ -141,7 +141,7 @@ export function AttendanceCalendar({ userId }: AttendanceCalendarProps) {
                 key={day}
                 onClick={() => record && setSelected(record)}
                 className={`
-                  relative flex flex-col items-center justify-start py-1.5 rounded-lg text-[12px] transition-all
+                  relative flex flex-col items-center justify-start py-1.5 rounded-lg text-caption transition-all
                   ${isToday ? "bg-[#7b68ee] text-white" : "hover:bg-[#e9ebf0]"}
                   ${record ? "cursor-pointer" : "cursor-default"}
                 `}
@@ -181,7 +181,7 @@ export function AttendanceCalendar({ userId }: AttendanceCalendarProps) {
               <div
                 className={`w-2 h-2 rounded-full ${info.color.replace("text-", "bg-").replace("-700", "-500")}`}
               />
-              <span className="text-[11px] text-[#b3b3b3]">{info.label}</span>
+              <span className="text-caption text-[#b3b3b3]">{info.label}</span>
             </div>
           ))}
         </div>
@@ -197,7 +197,7 @@ export function AttendanceCalendar({ userId }: AttendanceCalendarProps) {
           { key: "onLeave",    label: "휴가", color: "text-blue-600" },
         ].map(({ key, label, color }) => (
           <Card key={key} className="p-3 shadow-card border-[#e8e8e8] rounded-xl text-center">
-            <p className="text-[11px] text-[#b3b3b3]">{label}</p>
+            <p className="text-caption text-[#b3b3b3]">{label}</p>
             <p className={`text-[20px] font-bold mt-0.5 ${color}`}
                style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}>
               {(summary as any)[key] ?? 0}
@@ -210,11 +210,11 @@ export function AttendanceCalendar({ userId }: AttendanceCalendarProps) {
       {selected && (
         <Card className="p-4 shadow-card border-[#e8e8e8] rounded-xl">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-[13px] font-semibold text-[#090c1d]">
+            <p className="text-body-sm font-semibold text-[#090c1d]">
               {format(parseISO(selected.date), "M월 d일 (EEE)", { locale: ko })} 상세
             </p>
             <Badge
-              className={`text-[11px] px-2 py-0.5 rounded-full border-0 ${
+              className={`text-caption px-2 py-0.5 rounded-full border-0 ${
                 attendanceStatusMap[selected.status]?.bg
               } ${attendanceStatusMap[selected.status]?.color}`}
             >
@@ -223,19 +223,19 @@ export function AttendanceCalendar({ userId }: AttendanceCalendarProps) {
           </div>
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
-              <p className="text-[11px] text-[#b3b3b3]">출근</p>
+              <p className="text-caption text-[#b3b3b3]">출근</p>
               <p className="text-[16px] font-semibold text-[#090c1d]">
                 {selected.checkIn ? formatTime(selected.checkIn) : "-"}
               </p>
             </div>
             <div>
-              <p className="text-[11px] text-[#b3b3b3]">퇴근</p>
+              <p className="text-caption text-[#b3b3b3]">퇴근</p>
               <p className="text-[16px] font-semibold text-[#090c1d]">
                 {selected.checkOut ? formatTime(selected.checkOut) : "-"}
               </p>
             </div>
             <div>
-              <p className="text-[11px] text-[#b3b3b3]">근무시간</p>
+              <p className="text-caption text-[#b3b3b3]">근무시간</p>
               <p className="text-[16px] font-semibold text-[#090c1d]">
                 {formatWorkMinutes(selected.workMinutes)}
               </p>

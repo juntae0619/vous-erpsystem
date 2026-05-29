@@ -61,12 +61,12 @@ export function ApprovalActionPanel({ documentId, canApprove, currentUserRole, i
       {action === "REJECTED" ? (
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label className="text-[13px] font-medium text-[#292d34]">반려 사유</Label>
+            <Label className="text-body-sm font-medium text-[#292d34]">반려 사유</Label>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="반려 사유를 입력해주세요"
-              className="text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[80px]"
+              className="text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[80px]"
               autoFocus
             />
           </div>
@@ -81,7 +81,7 @@ export function ApprovalActionPanel({ documentId, canApprove, currentUserRole, i
             </Button>
             <Button
               variant="outline"
-              className="h-9 text-[13px] border-[#e8e8e8] rounded-lg"
+              className="h-9 text-body-sm border-[#e8e8e8] rounded-lg"
               onClick={() => { setAction(null); setComment(""); }}
               disabled={loading}
             >
@@ -93,12 +93,12 @@ export function ApprovalActionPanel({ documentId, canApprove, currentUserRole, i
         <div className="space-y-3">
           {/* 의견 입력 (선택) */}
           <div className="space-y-1.5">
-            <Label className="text-[13px] font-medium text-[#292d34]">의견 (선택)</Label>
+            <Label className="text-body-sm font-medium text-[#292d34]">의견 (선택)</Label>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="결재 의견을 남겨주세요 (선택)"
-              className="text-[13px] border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[60px]"
+              className="text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ring-[#7b68ee] resize-none min-h-[60px]"
             />
           </div>
 
@@ -115,7 +115,7 @@ export function ApprovalActionPanel({ documentId, canApprove, currentUserRole, i
             {(currentUserRole === "MANAGER" || currentUserRole === "ADMIN") && (
               <Button
                 variant="outline"
-                className="flex-1 h-9 text-[13px] border-[#7b68ee] text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg"
+                className="flex-1 h-9 text-body-sm border-[#7b68ee] text-[#7b68ee] hover:bg-[#edf6fd] rounded-lg"
                 onClick={() => submit("APPROVED", true)}
                 disabled={loading}
               >

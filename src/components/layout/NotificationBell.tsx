@@ -117,12 +117,12 @@ export function NotificationBell() {
           {/* 헤더 */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-[#e8e8e8]">
             <span
-              className="text-[14px] font-semibold text-[#090c1d]"
+              className="text-body-sm font-semibold text-[#090c1d]"
               style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
             >
               알림
               {unreadCount > 0 && (
-                <span className="ml-1.5 text-[11px] font-medium text-[#7b68ee]">
+                <span className="ml-1.5 text-caption font-medium text-[#7b68ee]">
                   {unreadCount}개 미읽음
                 </span>
               )}
@@ -130,7 +130,7 @@ export function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="flex items-center gap-1 text-[12px] text-[#7b68ee] hover:text-[#6a58de] transition-colors"
+                className="flex items-center gap-1 text-caption text-[#7b68ee] hover:text-[#6a58de] transition-colors"
               >
                 <CheckCheck size={13} />
                 모두 읽음
@@ -143,7 +143,7 @@ export function NotificationBell() {
             {notifications.length === 0 ? (
               <div className="py-10 text-center">
                 <Bell size={24} className="mx-auto text-[#e8e8e8] mb-2" />
-                <p className="text-[13px] text-[#b3b3b3]">새 알림이 없습니다</p>
+                <p className="text-body-sm text-[#b3b3b3]">새 알림이 없습니다</p>
               </div>
             ) : (
               notifications.map((n) => (
@@ -159,13 +159,13 @@ export function NotificationBell() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <p className={`text-[13px] truncate ${!n.isRead ? "font-semibold text-[#090c1d]" : "font-medium text-[#292d34]"}`}>
+                      <p className={`text-body-sm truncate ${!n.isRead ? "font-semibold text-[#090c1d]" : "font-medium text-[#292d34]"}`}>
                         {n.title}
                       </p>
                       {n.link && <ExternalLink size={11} className="shrink-0 text-[#b3b3b3]" />}
                     </div>
-                    <p className="text-[12px] text-[#b3b3b3] mt-0.5 line-clamp-2">{n.message}</p>
-                    <p className="text-[11px] text-[#d0d0d0] mt-1">
+                    <p className="text-caption text-[#b3b3b3] mt-0.5 line-clamp-2">{n.message}</p>
+                    <p className="text-caption text-[#d0d0d0] mt-1">
                       {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale: ko })}
                     </p>
                   </div>

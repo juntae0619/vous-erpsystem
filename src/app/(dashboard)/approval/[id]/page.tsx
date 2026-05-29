@@ -72,15 +72,15 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
           <Card className="p-5 shadow-card border-[#e8e8e8] rounded-xl">
             <div className="flex items-start justify-between gap-3 mb-4">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] text-[#b3b3b3] bg-[#f8f9fb] px-2 py-0.5 rounded-full">
+                <span className="text-caption text-[#b3b3b3] bg-[#f8f9fb] px-2 py-0.5 rounded-full">
                   {DOC_TYPE_MAP[doc.type] ?? doc.type}
                 </span>
                 <ApprovalStatusBadge status={doc.status as import("@/components/approval/ApprovalStatusBadge").ApprovalStatus} />
                 {doc.isFinalDecision && (
-                  <span className="text-[11px] text-[#7b68ee] bg-[#edf6fd] px-2 py-0.5 rounded-full">전결</span>
+                  <span className="text-caption text-[#7b68ee] bg-[#edf6fd] px-2 py-0.5 rounded-full">전결</span>
                 )}
               </div>
-              <p className="text-[11px] text-[#b3b3b3] shrink-0">
+              <p className="text-caption text-[#b3b3b3] shrink-0">
                 {format(doc.createdAt, "yyyy.MM.dd HH:mm", { locale: ko })}
               </p>
             </div>
@@ -94,12 +94,12 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
 
             {/* 작성자 */}
             <div className="flex items-center gap-2.5 p-3 bg-[#f8f9fb] rounded-xl mb-4">
-              <div className="w-8 h-8 rounded-full bg-[#e9ebf0] flex items-center justify-center text-[13px] font-semibold text-[#292d34]">
+              <div className="w-8 h-8 rounded-full bg-[#e9ebf0] flex items-center justify-center text-body-sm font-semibold text-[#292d34]">
                 {doc.submitter.name[0]}
               </div>
               <div>
-                <p className="text-[13px] font-medium text-[#292d34]">{doc.submitter.name}</p>
-                <p className="text-[11px] text-[#b3b3b3]">
+                <p className="text-body-sm font-medium text-[#292d34]">{doc.submitter.name}</p>
+                <p className="text-caption text-[#b3b3b3]">
                   {doc.submitter.position} · {doc.submitter.team}
                 </p>
               </div>
@@ -107,7 +107,7 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
 
             {/* 내용 */}
             <div className="prose prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap text-[13px] text-[#292d34] font-sans leading-relaxed">
+              <pre className="whitespace-pre-wrap text-body-sm text-[#292d34] font-sans leading-relaxed">
                 {doc.content}
               </pre>
             </div>
@@ -115,12 +115,12 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
             {/* 지출 정보 */}
             {doc.expenseAmount && (
               <div className="mt-4 p-3 bg-[#f8f9fb] rounded-xl">
-                <p className="text-[11px] text-[#b3b3b3] mb-1">지출 금액</p>
+                <p className="text-caption text-[#b3b3b3] mb-1">지출 금액</p>
                 <p className="text-[15px] font-bold text-[#090c1d]">
                   {formatKRW(Number(doc.expenseAmount))}
                 </p>
                 {doc.expenseItems && (
-                  <pre className="mt-2 text-[12px] text-[#292d34] whitespace-pre-wrap font-sans">
+                  <pre className="mt-2 text-caption text-[#292d34] whitespace-pre-wrap font-sans">
                     {doc.expenseItems}
                   </pre>
                 )}
@@ -131,7 +131,7 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
           {/* 결재선 */}
           <Card className="p-5 shadow-card border-[#e8e8e8] rounded-xl">
             <h3
-              className="text-[13px] font-semibold text-[#090c1d] mb-4"
+              className="text-body-sm font-semibold text-[#090c1d] mb-4"
               style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}
             >
               결재선
@@ -143,10 +143,10 @@ export default async function ApprovalDetailPage({ params }: { params: Promise<{
               {doc.steps.map((step) => (
                 step.comment && (
                   <div key={step.id} className="p-3 bg-[#f8f9fb] rounded-xl">
-                    <p className="text-[11px] text-[#b3b3b3]">
+                    <p className="text-caption text-[#b3b3b3]">
                       {step.approver?.name} 의견
                     </p>
-                    <p className="text-[13px] text-[#292d34] mt-0.5">{step.comment}</p>
+                    <p className="text-body-sm text-[#292d34] mt-0.5">{step.comment}</p>
                   </div>
                 )
               ))}

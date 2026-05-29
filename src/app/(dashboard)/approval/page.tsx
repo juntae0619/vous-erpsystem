@@ -77,7 +77,7 @@ export default async function ApprovalPage() {
             <section>
               <h2 className="text-[15px] font-semibold text-[#090c1d] mb-3" style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}>
                 결재 대기
-                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#7b68ee] text-white text-[11px] font-bold">
+                <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#7b68ee] text-white text-caption font-bold">
                   {pendingForMe.length}
                 </span>
               </h2>
@@ -96,10 +96,10 @@ export default async function ApprovalPage() {
             {myDocs.length === 0 ? (
               <Card className="py-16 shadow-card border-[#e8e8e8] rounded-xl text-center">
                 <FileText size={32} className="text-[#e8e8e8] mx-auto mb-3" />
-                <p className="text-[13px] text-[#b3b3b3] mb-4">작성한 문서가 없습니다</p>
+                <p className="text-body-sm text-[#b3b3b3] mb-4">작성한 문서가 없습니다</p>
                 <Link
                   href="/approval/new"
-                  className={cn(buttonVariants({ variant: "outline" }), "text-[13px] border-[#e8e8e8] rounded-lg")}
+                  className={cn(buttonVariants({ variant: "outline" }), "text-body-sm border-[#e8e8e8] rounded-lg")}
                 >
                   문서 작성하기
                 </Link>
@@ -139,21 +139,21 @@ function ApprovalDocCard({ doc, showSubmitter = false }: { doc: DocWithSteps; sh
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span className="text-[11px] text-[#b3b3b3] bg-[#f8f9fb] px-2 py-0.5 rounded-full">
+              <span className="text-caption text-[#b3b3b3] bg-[#f8f9fb] px-2 py-0.5 rounded-full">
                 {DOC_TYPE_MAP[doc.type] ?? doc.type}
               </span>
               <ApprovalStatusBadge status={doc.status as import("@/components/approval/ApprovalStatusBadge").ApprovalStatus} />
               {doc.isFinalDecision && (
-                <span className="text-[11px] text-[#7b68ee] bg-[#edf6fd] px-2 py-0.5 rounded-full">전결</span>
+                <span className="text-caption text-[#7b68ee] bg-[#edf6fd] px-2 py-0.5 rounded-full">전결</span>
               )}
             </div>
-            <h3 className="text-[13px] font-semibold text-[#090c1d] truncate">{doc.title}</h3>
+            <h3 className="text-body-sm font-semibold text-[#090c1d] truncate">{doc.title}</h3>
             {showSubmitter && doc.submitter && (
-              <p className="text-[12px] text-[#b3b3b3] mt-0.5">
+              <p className="text-caption text-[#b3b3b3] mt-0.5">
                 {doc.submitter.name} · {doc.submitter.team}
               </p>
             )}
-            <p className="text-[11px] text-[#b3b3b3] mt-1">
+            <p className="text-caption text-[#b3b3b3] mt-1">
               {format(doc.createdAt, "yyyy.MM.dd", { locale: ko })}
             </p>
           </div>
