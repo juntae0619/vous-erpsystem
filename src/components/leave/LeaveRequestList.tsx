@@ -69,59 +69,65 @@ export function LeaveRequestList({ requests, showUser = false }: Props) {
   }
 
   return (
-    <div className="space-y-2">
-      {requests.map((req) => {
-        const status = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.PENDING;
-        const typeLabel = LEAVE_TYPE_LABELS[req.type as keyof typeof LEAVE_TYPE_LABELS] ?? req.type;
-        const halfLabel = req.halfDayType ? ` (${HALF_DAY_MAP[req.halfDayType]})` : "";
-        const start = format(new Date(req.startDate), "yyyy.MM.dd", { locale: ko });
-        const end = format(new Date(req.endDate), "yyyy.MM.dd", { locale: ko });
-        const dateLabel = start === end ? start : `${start} ~ ${end}`;
-
-        return (
-          <Card key={req.id}>
-            <div className="flex items-start gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                  <span className="text-body-sm font-semibold text-deep-space-charcoal">
-                    {typeLabel}{halfLabel}
-                  </span>
-                  <Badge variant={status.variant}>
-                    {status.label}
-                  </Badge>
-                  {showUser && req.user && (
-                    <span className="text-caption text-smoke-gray">
-                      {req.user.name} · {req.user.team}
-                    </span>
+    <div className="overflow-hidden rounded-xl border border-border">
+      <table className="w-full text-body-sm">
+        <thead>
+          <tr className="bg-[#2c3e6b] text-white">
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap w-12">연번</th>
+            {showUser && <th className="px-4 py-3 text-left font-semibold whitespace-nowrap">신청자</th>}
+            <th className="px-4 py-3 text-left font-semibold whitespace-nowrap">종류</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">기간</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">일수</th>
+            <th className="px-4 py-3 text-left font-semibold">사유</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">상태</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">관리</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {requests.map((req, idx) => {
+            const status = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.PENDING;
+            const typeLabel = LEAVE_TYPE_LABELS[req.type as keyof typeof LEAVE_TYPE_LABELS] ?? req.type;
+            const halfLabel = req.halfDayType ? ` (${HALF_DAY_MAP[req.halfDayType]})` : "";
+            const start = format(new Date(req.startDate), "yyyy.MM.dd", { locale: ko });
+            const end = format(new Date(req.endDate), "yyyy.MM.dd", { locale: ko });
+            const dateLabel = start === end ? start : `${start} ~ ${end}`;
+            return (
+              <tr key={req.id} className="hover:bg-hint-of-sky transition-colors">
+                <td className="px-4 py-3 text-center text-smoke-gray">{idx + 1}</td>
+                {showUser && req.user && (
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <p className="font-medium text-midnight-charcoal">{req.user.name}</p>
+                    <p className="text-caption text-smoke-gray">{req.user.team}</p>
+                  </td>
+                )}
+                <td className="px-4 py-3 whitespace-nowrap font-medium text-midnight-charcoal">
+                  {typeLabel}{halfLabel}
+                </td>
+                <td className="px-4 py-3 text-center whitespace-nowrap text-smoke-gray">{dateLabel}</td>
+                <td className="px-4 py-3 text-center whitespace-nowrap">{Number(req.days)}일</td>
+                <td className="px-4 py-3 max-w-[180px]">
+                  <p className="truncate text-smoke-gray">{req.reason}</p>
+                  {req.status === "REJECTED" && req.rejectionReason && (
+                    <p className="text-caption text-rich-plum">반려: {req.rejectionReason}</p>
                   )}
-                </div>
-                <p className="text-caption text-midnight-charcoal">
-                  {dateLabel} · {Number(req.days)}일
-                </p>
-                <p className="mt-0.5 truncate text-caption text-smoke-gray">{req.reason}</p>
-                {req.status === "REJECTED" && req.rejectionReason && (
-                  <p className="mt-1 text-caption text-rich-plum">반려 사유: {req.rejectionReason}</p>
-                )}
-                {req.approver && req.status === "APPROVED" && (
-                  <p className="mt-1 text-caption text-smoke-gray">승인: {req.approver.name}</p>
-                )}
-              </div>
-
-              {req.status === "PENDING" && !showUser && (
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="shrink-0 text-smoke-gray hover:text-rich-plum"
-                  onClick={() => handleCancel(req.id)}
-                  disabled={deletingId === req.id}
-                >
-                  <Trash2 size={13} />
-                </Button>
-              )}
-            </div>
-          </Card>
-        );
-      })}
+                </td>
+                <td className="px-4 py-3 text-center">
+                  <Badge variant={status.variant}>{status.label}</Badge>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  {req.status === "PENDING" && !showUser && (
+                    <Button variant="ghost" size="icon-sm"
+                      className="text-smoke-gray hover:text-rich-plum"
+                      onClick={() => handleCancel(req.id)} disabled={deletingId === req.id}>
+                      <Trash2 size={13} />
+                    </Button>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -147,94 +147,82 @@ export function DisbursementList({
   }
 
   return (
-    <div className="space-y-2">
-      {items.map((item) => {
-        const typeLabel =
-          DISBURSEMENT_TYPE_LABELS[item.itemType as DisbursementTypeValue] ??
-          item.itemType;
-        const scheduled = format(new Date(item.scheduledDate), "yyyy.MM.dd", {
-          locale: ko,
-        });
-
-        return (
-          <Card key={item.id} className="gap-3 overflow-visible p-4">
-            <div className="flex items-start gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="mb-1 flex flex-wrap items-center gap-2">
-                  <span className="text-body-sm font-semibold text-deep-space-charcoal">
-                    {item.vendorName}
-                  </span>
+    <div className="overflow-hidden rounded-xl border border-border">
+      <table className="w-full text-body-sm">
+        <thead>
+          <tr className="bg-[#2c3e6b] text-white">
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap w-12">연번</th>
+            <th className="px-4 py-3 text-left font-semibold whitespace-nowrap">거래처</th>
+            <th className="px-4 py-3 text-left font-semibold whitespace-nowrap">항목</th>
+            <th className="px-4 py-3 text-left font-semibold">내용</th>
+            <th className="px-4 py-3 text-right font-semibold whitespace-nowrap">금액</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">지급예정일</th>
+            {isManager && <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">담당</th>}
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">계산서</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">상태</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">관리</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {items.map((item, idx) => {
+            const typeLabel = DISBURSEMENT_TYPE_LABELS[item.itemType as DisbursementTypeValue] ?? item.itemType;
+            const scheduled = format(new Date(item.scheduledDate), "yyyy.MM.dd", { locale: ko });
+            return (
+              <tr key={item.id} className="hover:bg-hint-of-sky transition-colors">
+                <td className="px-4 py-3 text-center text-smoke-gray">{idx + 1}</td>
+                <td className="px-4 py-3 whitespace-nowrap font-medium text-midnight-charcoal">{item.vendorName}</td>
+                <td className="px-4 py-3 whitespace-nowrap">
                   <Badge variant="neutral">{typeLabel}</Badge>
+                </td>
+                <td className="px-4 py-3 max-w-[200px] truncate text-smoke-gray" title={item.description}>
+                  {item.description}
+                  {item.note && <span className="ml-1 text-caption text-smoke-gray/70">({item.note})</span>}
+                </td>
+                <td className="px-4 py-3 text-right whitespace-nowrap font-medium">{formatKRW(item.amount)}</td>
+                <td className="px-4 py-3 text-center whitespace-nowrap text-smoke-gray">{scheduled}</td>
+                {isManager && (
+                  <td className="px-4 py-3 text-center whitespace-nowrap text-smoke-gray">
+                    {item.assignee.name}
+                  </td>
+                )}
+                <td className="px-4 py-3 text-center">
+                  <TaxInvoiceStatusBadge status={item.taxInvoiceStatus as TaxInvoiceStatusValue} />
+                </td>
+                <td className="px-4 py-3 text-center">
                   <Badge variant={item.isPaid ? "positive" : "attention"}>
                     {item.isPaid ? "지급완료" : "미지급"}
                   </Badge>
-                  <TaxInvoiceStatusBadge
-                    status={item.taxInvoiceStatus as TaxInvoiceStatusValue}
-                  />
-                </div>
-                <p className="text-body-sm text-midnight-charcoal">{item.description}</p>
-                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-caption text-smoke-gray">
-                  <span>{formatKRW(item.amount)}</span>
-                  <span>예정일 {scheduled}</span>
-                  {item.isPaid && item.paidDate && (
-                    <span>
-                      지급일{" "}
-                      {format(new Date(item.paidDate), "yyyy.MM.dd", { locale: ko })}
-                    </span>
-                  )}
-                  {isManager && (
-                    <span>
-                      담당 {item.assignee.name}
-                      {item.assignee.team ? ` · ${item.assignee.team}` : ""}
-                    </span>
-                  )}
-                  {item.taxInvoiceNumber && (
-                    <span>계산서 {item.taxInvoiceNumber}</span>
-                  )}
-                </div>
-                {item.note && (
-                  <p className="mt-1 text-caption text-smoke-gray">{item.note}</p>
-                )}
-              </div>
-
-              <div className="flex shrink-0 flex-col gap-1.5 sm:flex-row">
-                <Button
-                  type="button"
-                  variant={item.isPaid ? "outline" : "default"}
-                  size="sm"
-                  className="h-8 text-caption"
-                  disabled={loadingId === item.id}
-                  onClick={() => togglePaid(item)}
-                >
-                  {item.isPaid ? "미지급으로" : "지급완료"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon-sm"
-                  className="shrink-0"
-                  onClick={() => setEditingItem(item)}
-                  disabled={loadingId === item.id}
-                >
-                  <Pencil size={13} />
-                </Button>
-                {!item.isPaid && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    className="shrink-0 text-smoke-gray hover:text-rich-plum"
-                    onClick={() => handleDelete(item.id)}
-                    disabled={loadingId === item.id}
-                  >
-                    <Trash2 size={13} />
-                  </Button>
-                )}
-              </div>
-            </div>
-          </Card>
-        );
-      })}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Button
+                      type="button"
+                      variant={item.isPaid ? "outline" : "default"}
+                      size="sm"
+                      className="h-7 text-caption whitespace-nowrap"
+                      disabled={loadingId === item.id}
+                      onClick={() => togglePaid(item)}
+                    >
+                      {item.isPaid ? "미지급" : "지급완료"}
+                    </Button>
+                    <Button type="button" variant="outline" size="icon-sm"
+                      onClick={() => setEditingItem(item)} disabled={loadingId === item.id}>
+                      <Pencil size={13} />
+                    </Button>
+                    {!item.isPaid && (
+                      <Button type="button" variant="ghost" size="icon-sm"
+                        className="text-smoke-gray hover:text-rich-plum"
+                        onClick={() => handleDelete(item.id)} disabled={loadingId === item.id}>
+                        <Trash2 size={13} />
+                      </Button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

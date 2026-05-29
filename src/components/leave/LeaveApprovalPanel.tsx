@@ -75,8 +75,21 @@ export function LeaveApprovalPanel({ requests, currentUserId }: Props) {
   }
 
   return (
-    <div className="space-y-3">
-      {requests.map((req) => {
+    <div className="overflow-hidden rounded-xl border border-border">
+      <table className="w-full text-body-sm">
+        <thead>
+          <tr className="bg-[#2c3e6b] text-white">
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap w-12">연번</th>
+            <th className="px-4 py-3 text-left font-semibold whitespace-nowrap">신청자</th>
+            <th className="px-4 py-3 text-left font-semibold whitespace-nowrap">종류</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">기간</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">일수</th>
+            <th className="px-4 py-3 text-left font-semibold">사유</th>
+            <th className="px-4 py-3 text-center font-semibold whitespace-nowrap">처리</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+      {requests.map((req, idx) => {
         const typeLabel =
           LEAVE_TYPE_LABELS[req.type as keyof typeof LEAVE_TYPE_LABELS] ?? req.type;
         const halfLabel = req.halfDayType ? ` (${HALF_MAP[req.halfDayType]})` : "";
@@ -87,89 +100,58 @@ export function LeaveApprovalPanel({ requests, currentUserId }: Props) {
         const isOwnRequest = currentUserId === req.user.id;
 
         return (
-          <Card key={req.id} className="gap-3 overflow-visible p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-hint-of-sky text-body-sm font-semibold text-midnight-charcoal">
-                {req.user.name[0]}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="mb-0.5 flex flex-wrap items-center gap-1.5">
-                  <span className="text-body-sm font-semibold text-deep-space-charcoal">
-                    {req.user.name}
-                  </span>
-                  <span className="text-caption text-smoke-gray">
-                    {req.user.position} · {req.user.team}
-                  </span>
-                  {isOwnRequest && (
-                    <span className="rounded-full bg-hint-of-sky px-2 py-0.5 text-caption text-smoke-gray">
-                      본인 신청
-                    </span>
-                  )}
-                </div>
-                <p className="text-body-sm text-midnight-charcoal">
-                  {typeLabel}
-                  {halfLabel} · {dateLabel} ({Number(req.days)}일)
+          <>
+            <tr key={req.id} className="hover:bg-hint-of-sky transition-colors">
+              <td className="px-4 py-3 text-center text-smoke-gray">{idx + 1}</td>
+              <td className="px-4 py-3 whitespace-nowrap">
+                <p className="font-medium text-midnight-charcoal">
+                  {req.user.name}
+                  {isOwnRequest && <span className="ml-1.5 text-caption text-smoke-gray">(본인)</span>}
                 </p>
-                <p className="mt-0.5 text-caption text-smoke-gray">{req.reason}</p>
-              </div>
-            </div>
-
-            {isRejecting ? (
-              <div className="flex flex-col gap-2 border-t border-border pt-3 sm:flex-row">
-                <Input
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="반려 사유 입력"
-                  className="h-9 flex-1 text-body-sm"
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <Button
-                    variant="destructive"
-                    className="flex-1 sm:flex-none"
-                    onClick={() => handleAction(req.id, "REJECTED")}
-                    disabled={loadingId === req.id}
-                  >
-                    반려 확인
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex-1 sm:flex-none"
-                    onClick={() => {
-                      setRejectingId(null);
-                      setRejectionReason("");
-                    }}
-                    disabled={loadingId === req.id}
-                  >
-                    취소
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex gap-2 border-t border-border pt-3">
-                <Button
-                  className="flex-1"
-                  onClick={() => handleAction(req.id, "APPROVED")}
-                  disabled={loadingId === req.id}
-                >
-                  <Check size={14} />
-                  승인
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="flex-1"
-                  onClick={() => setRejectingId(req.id)}
-                  disabled={loadingId === req.id}
-                >
-                  <X size={14} />
-                  반려
-                </Button>
-              </div>
+                <p className="text-caption text-smoke-gray">{req.user.position} · {req.user.team}</p>
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap font-medium">{typeLabel}{halfLabel}</td>
+              <td className="px-4 py-3 text-center whitespace-nowrap text-smoke-gray">{dateLabel}</td>
+              <td className="px-4 py-3 text-center">{Number(req.days)}일</td>
+              <td className="px-4 py-3 max-w-[200px] truncate text-smoke-gray">{req.reason}</td>
+              <td className="px-4 py-3">
+                {!isRejecting && (
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Button size="sm" className="h-7 gap-1"
+                      onClick={() => handleAction(req.id, "APPROVED")} disabled={loadingId === req.id}>
+                      <Check size={12} /> 승인
+                    </Button>
+                    <Button variant="destructive" size="sm" className="h-7 gap-1"
+                      onClick={() => setRejectingId(req.id)} disabled={loadingId === req.id}>
+                      <X size={12} /> 반려
+                    </Button>
+                  </div>
+                )}
+              </td>
+            </tr>
+            {isRejecting && (
+              <tr key={`${req.id}-reject`} className="bg-red-50">
+                <td colSpan={7} className="px-4 py-3">
+                  <div className="flex gap-2">
+                    <Input value={rejectionReason} onChange={(e) => setRejectionReason(e.target.value)}
+                      placeholder="반려 사유 입력" className="h-9 flex-1 text-body-sm" autoFocus />
+                    <Button variant="destructive"
+                      onClick={() => handleAction(req.id, "REJECTED")} disabled={loadingId === req.id}>
+                      반려 확인
+                    </Button>
+                    <Button variant="outline"
+                      onClick={() => { setRejectingId(null); setRejectionReason(""); }} disabled={loadingId === req.id}>
+                      취소
+                    </Button>
+                  </div>
+                </td>
+              </tr>
             )}
-          </Card>
+          </>
         );
       })}
+        </tbody>
+      </table>
     </div>
   );
 }
