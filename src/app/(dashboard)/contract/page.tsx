@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout/Header";
@@ -203,4 +203,27 @@ export default async function ContractPage({
                           </Link>
                         </td>
                         <td className="px-4 py-3 max-w-[280px]">
-                          <span className="line-clamp-2 leading-snug
+                          <span className="line-clamp-2 leading-snug" title={r.contractName}>{r.contractName}</span>
+                        </td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">{formatKRW(r.serviceAmount)}</td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">{formatKRW(r.billed)}</td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">{formatKRW(r.paid)}</td>
+                        <td className={cn("px-4 py-3 text-right whitespace-nowrap", r.unpaid > 0 ? "text-rich-plum font-semibold" : "")}>
+                          {formatKRW(r.unpaid)}
+                        </td>
+                        <td className={cn("px-4 py-3 text-right whitespace-nowrap", r.unbilled > 0 ? "text-smoke-gray" : "")}>
+                          {formatKRW(r.unbilled)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
