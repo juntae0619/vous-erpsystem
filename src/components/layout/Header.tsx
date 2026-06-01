@@ -17,7 +17,7 @@ export function Header({ title, subtitle, showBack, actions }: HeaderProps) {
   const router = useRouter();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between px-6" style={{ backgroundColor: "#1a7a5e" }}>
+    <header className="flex h-14 shrink-0 items-center justify-between pl-14 pr-6 md:pl-6" style={{ backgroundColor: "#1a7a5e" }}>
       <div className="flex min-w-0 items-center gap-2">
         {showBack && (
           <Button

@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { MobileSidebarWrapper } from "@/components/layout/MobileSidebarWrapper";
 
 export default async function DashboardLayout({
   children,
@@ -19,7 +19,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-hint-of-sky">
-      <Sidebar
+      <MobileSidebarWrapper
         userRole={user?.role ?? session.user.role}
         userName={user?.name ?? session.user.name ?? ""}
         userPosition={user?.position ?? undefined}
