@@ -14,22 +14,52 @@ import {
   Users,
   UserCircle,
   LogOut,
-  ChevronRight,
   Shield,
   BookUser,
 } from "lucide-react";
 
-const navItems = [
-  { label: "대시보드", href: "/dashboard", icon: LayoutDashboard },
-  { label: "출퇴근 관리", href: "/attendance", icon: Clock },
-  { label: "휴가 관리", href: "/leave", icon: CalendarDays },
-  { label: "전자결재", href: "/approval", icon: FileText },
-  { label: "계약·수금 관리", href: "/contract", icon: Building2 },
-  { label: "지급 관리", href: "/disbursement", icon: Wallet },
-  { label: "지자체 연락처", href: "/local-gov-contacts", icon: BookUser },
-  { label: "사용자 관리", href: "/users", icon: Users, adminOnly: true },
-  { label: "감사 로그", href: "/admin/audit", icon: Shield, adminOnly: true },
-  { label: "내 프로필", href: "/profile", icon: UserCircle },
+type NavItem = {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  adminOnly?: boolean;
+};
+
+type NavGroup = {
+  group?: string;
+  items: NavItem[];
+};
+
+const navGroups: NavGroup[] = [
+  {
+    items: [
+      { label: "대시보드", href: "/dashboard", icon: LayoutDashboard },
+    ],
+  },
+  {
+    group: "근태",
+    items: [
+      { label: "출퇴근 관리", href: "/attendance", icon: Clock },
+      { label: "휴가 관리",   href: "/leave",      icon: CalendarDays },
+    ],
+  },
+  {
+    group: "업무",
+    items: [
+      { label: "전자결재",     href: "/approval",         icon: FileText },
+      { label: "계약·수금",   href: "/contract",          icon: Building2 },
+      { label: "지급 관리",   href: "/disbursement",      icon: Wallet },
+      { label: "지자체 연락처", href: "/local-gov-contacts", icon: BookUser },
+    ],
+  },
+  {
+    group: "시스템",
+    items: [
+      { label: "사용자 관리", href: "/users",       icon: Users,      adminOnly: true },
+      { label: "감사 로그",   href: "/admin/audit", icon: Shield,     adminOnly: true },
+      { label: "내 프로필",   href: "/profile",     icon: UserCircle },
+    ],
+  },
 ];
 
 interface SidebarProps {
@@ -42,68 +72,107 @@ export function Sidebar({ userRole, userName, userPosition }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex min-h-screen w-[220px] shrink-0 flex-col border-r border-border bg-canvas-white">
+    <aside
+      className="flex min-h-screen w-[230px] shrink-0 flex-col"
+      style={{ backgroundColor: "#f0ede6" }}
+    >
+      {/* 로고 */}
       <Link
         href="/dashboard"
-        className="flex h-14 items-center gap-2.5 border-b border-border px-5 transition-colors hover:bg-hint-of-sky"
+        className="flex h-16 items-center gap-3 px-5 transition-opacity hover:opacity-80"
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-buttons)] bg-dark-onyx">
-          <span className="font-heading text-body-sm font-bold text-white">V</span>
+        <div
+          className="flex h-8 w-8 items-center justify-center rounded-xl text-white font-bold text-body-sm"
+          style={{ backgroundColor: "#1a7a5e" }}
+        >
+          V
         </div>
-        <span className="font-heading text-body-sm font-bold tracking-body text-deep-space-charcoal">
+        <span className="font-bold text-body-sm tracking-tight" style={{ color: "#1a2e28" }}>
           VOUS ERP
         </span>
       </Link>
 
-      <nav className="flex-1 space-y-0.5 px-3 py-4">
-        {navItems.map((item) => {
-          if (item.adminOnly && userRole !== "ADMIN") return null;
-
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
+      {/* 네비게이션 */}
+      <nav className="flex-1 overflow-y-auto px-3 pb-4">
+        {navGroups.map((group, gi) => {
+          const visibleItems = group.items.filter(
+            (item) => !item.adminOnly || userRole === "ADMIN"
+          );
+          if (visibleItems.length === 0) return null;
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "group flex items-center gap-2.5 rounded-[var(--radius-buttons)] px-3 py-2 text-body-sm font-medium transition-all",
-                isActive
-                  ? "nav-link-active"
-                  : "nav-link hover:bg-hint-of-sky"
+            <div key={gi} className={gi > 0 ? "mt-4" : ""}>
+              {group.group && (
+                <p
+                  className="mb-1 px-3 text-caption font-semibold uppercase tracking-wider"
+                  style={{ color: "#8a9490" }}
+                >
+                  {group.group}
+                </p>
               )}
-            >
-              <Icon
-                size={15}
-                className={cn(
-                  "shrink-0 transition-colors",
-                  isActive
-                    ? "text-deep-violet"
-                    : "text-smoke-gray group-hover:text-midnight-charcoal"
-                )}
-              />
-              <span className="flex-1">{item.label}</span>
-              {isActive && (
-                <ChevronRight size={12} className="text-deep-violet opacity-60" />
-              )}
-            </Link>
+              <div className="space-y-0.5">
+                {visibleItems.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(item.href + "/");
+                  const Icon = item.icon;
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-body-sm font-medium transition-all",
+                        isActive
+                          ? "text-white shadow-sm"
+                          : "hover:bg-black/5"
+                      )}
+                      style={
+                        isActive
+                          ? { backgroundColor: "#1a7a5e", color: "#fff" }
+                          : { color: "#2d4a3e" }
+                      }
+                    >
+                      <Icon
+                        size={16}
+                        className="shrink-0"
+                        style={{ color: isActive ? "#fff" : "#1a9e7e" }}
+                      />
+                      <span className="flex-1">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
       </nav>
 
-      <div className="border-t border-border p-3">
-        <div className="mb-1 flex flex-col items-center py-2">
-          <p className="text-body-sm font-semibold tracking-body-sm text-deep-space-charcoal">
-            {userName ?? "사용자"}
-          </p>
-          <p className="text-caption text-smoke-gray">
-            {userPosition ?? userRole ?? ""}
-          </p>
+      {/* 하단 유저 */}
+      <div
+        className="border-t px-4 py-4"
+        style={{ borderColor: "#ddd8ce" }}
+      >
+        <div className="mb-3 flex items-center gap-3">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-body-sm font-bold text-white"
+            style={{ backgroundColor: "#1a7a5e" }}
+          >
+            {userName?.[0] ?? "U"}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-body-sm font-semibold" style={{ color: "#1a2e28" }}>
+              {userName ?? "사용자"}
+            </p>
+            <p className="truncate text-caption" style={{ color: "#8a9490" }}>
+              {userPosition ?? userRole ?? ""}
+            </p>
+          </div>
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="nav-link flex w-full items-center justify-center gap-2.5 rounded-[var(--radius-buttons)] px-3 py-2 text-body-sm text-smoke-gray hover:bg-hint-of-sky"
+          className="flex w-full items-center justify-center gap-2 rounded-xl py-2 text-body-sm font-medium transition-colors hover:bg-black/5"
+          style={{ color: "#8a9490" }}
         >
           <LogOut size={14} />
           로그아웃
