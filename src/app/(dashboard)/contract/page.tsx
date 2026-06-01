@@ -104,9 +104,6 @@ export default async function ContractPage({
       <div className="flex-1 overflow-y-auto p-6">
         <div className="mx-auto max-w-6xl space-y-5">
 
-          {/* 대시보드 타이틀 */}
-          <h2 className="font-heading text-xl font-bold text-midnight-charcoal">대시보드</h2>
-
           {/* 검색 + 필터 */}
           <form method="get" className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[220px]">
