@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/layout/Header";
 
-const APP_URL = "http://192.168.0.66:5000";
+const APP_URL = "http://192.168.0.125:5000";
 const APP_PASSWORD = "1234";
 
 export default function ContractAppPage() {
