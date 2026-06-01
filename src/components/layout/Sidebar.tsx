@@ -79,16 +79,19 @@ export function Sidebar({ userRole, userName, userPosition }: SidebarProps) {
       {/* 로고 */}
       <Link
         href="/dashboard"
-        className="flex flex-col items-center px-5 pt-6 pb-4 transition-opacity hover:opacity-80"
+        className="flex flex-col items-center gap-1 px-5 pt-6 pb-4 transition-opacity hover:opacity-80"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo.png"
           alt="VOUCHER SERVICE"
-          width={120}
-          height={120}
+          width={64}
+          height={64}
           className="object-contain"
         />
+        <span className="font-extrabold text-sm tracking-widest uppercase" style={{ color: "#1a2e28", letterSpacing: "0.12em" }}>
+          VOUS ERP
+        </span>
       </Link>
 
       {/* 네비게이션 */}
