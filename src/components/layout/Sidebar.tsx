@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
@@ -82,13 +81,13 @@ export function Sidebar({ userRole, userName, userPosition }: SidebarProps) {
         href="/dashboard"
         className="flex flex-col items-center px-5 pt-6 pb-4 transition-opacity hover:opacity-80"
       >
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/logo.png"
           alt="VOUCHER SERVICE"
           width={120}
           height={120}
           className="object-contain"
-          priority
         />
       </Link>
 
