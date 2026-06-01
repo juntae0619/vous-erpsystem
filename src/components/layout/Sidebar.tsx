@@ -46,9 +46,9 @@ const navGroups: NavGroup[] = [
   {
     group: "업무",
     items: [
-      { label: "전자결재",     href: "/approval",         icon: FileText },
-      { label: "계약·수금",   href: "/contract",          icon: Building2 },
-      { label: "지급 관리",   href: "/disbursement",      icon: Wallet },
+      { label: "전자결재",       href: "/approval",         icon: FileText },
+      { label: "계약·수금(앱)", href: "/contract-app",     icon: Building2 },
+      { label: "지급 관리",     href: "/disbursement",     icon: Wallet },
       { label: "지자체 연락처", href: "/local-gov-contacts", icon: BookUser },
     ],
   },
