@@ -150,7 +150,7 @@ export function Sidebar({ userRole, userName, userPosition }: SidebarProps) {
 
       {/* 하단 유저 */}
       <div
-        className="border-t px-4 py-4"
+        className="border-t px-3 py-4"
         style={{ borderColor: "#ddd8ce" }}
       >
         <div className="mb-3 flex items-center gap-3">
