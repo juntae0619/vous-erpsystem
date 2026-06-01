@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
@@ -79,17 +80,16 @@ export function Sidebar({ userRole, userName, userPosition }: SidebarProps) {
       {/* 로고 */}
       <Link
         href="/dashboard"
-        className="flex flex-col items-center gap-2 px-5 pt-8 pb-6 transition-opacity hover:opacity-80"
+        className="flex flex-col items-center px-5 pt-6 pb-4 transition-opacity hover:opacity-80"
       >
-        <div
-          className="flex h-12 w-12 items-center justify-center rounded-2xl text-white font-extrabold text-xl shadow-md"
-          style={{ backgroundColor: "#1a7a5e" }}
-        >
-          V
-        </div>
-        <span className="font-extrabold text-base tracking-widest uppercase" style={{ color: "#1a2e28", letterSpacing: "0.15em" }}>
-          VOUS ERP
-        </span>
+        <Image
+          src="/logo.png"
+          alt="VOUCHER SERVICE"
+          width={120}
+          height={120}
+          className="object-contain"
+          priority
+        />
       </Link>
 
       {/* 네비게이션 */}
