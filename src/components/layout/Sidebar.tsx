@@ -79,15 +79,15 @@ export function Sidebar({ userRole, userName, userPosition }: SidebarProps) {
       {/* 로고 */}
       <Link
         href="/dashboard"
-        className="flex h-16 items-center gap-3 px-5 mt-2 transition-opacity hover:opacity-80"
+        className="flex flex-col items-center gap-2 px-5 pt-8 pb-6 transition-opacity hover:opacity-80"
       >
         <div
-          className="flex h-8 w-8 items-center justify-center rounded-xl text-white font-bold text-body-sm"
+          className="flex h-12 w-12 items-center justify-center rounded-2xl text-white font-extrabold text-xl shadow-md"
           style={{ backgroundColor: "#1a7a5e" }}
         >
           V
         </div>
-        <span className="font-bold text-body-sm tracking-tight" style={{ color: "#1a2e28" }}>
+        <span className="font-extrabold text-base tracking-widest uppercase" style={{ color: "#1a2e28", letterSpacing: "0.15em" }}>
           VOUS ERP
         </span>
       </Link>
