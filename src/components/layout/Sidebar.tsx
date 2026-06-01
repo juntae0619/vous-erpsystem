@@ -79,7 +79,7 @@ export function Sidebar({ userRole, userName, userPosition }: SidebarProps) {
       {/* 로고 */}
       <Link
         href="/dashboard"
-        className="flex h-16 items-center gap-3 px-5 transition-opacity hover:opacity-80"
+        className="flex h-16 items-center gap-3 px-5 mt-2 transition-opacity hover:opacity-80"
       >
         <div
           className="flex h-8 w-8 items-center justify-center rounded-xl text-white font-bold text-body-sm"
