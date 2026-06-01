@@ -17,22 +17,22 @@ export function Header({ title, subtitle, showBack, actions }: HeaderProps) {
   const router = useRouter();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-canvas-white px-6">
+    <header className="flex h-14 shrink-0 items-center justify-between px-6" style={{ backgroundColor: "#1a7a5e" }}>
       <div className="flex min-w-0 items-center gap-2">
         {showBack && (
           <Button
             variant="ghost"
             size="icon-sm"
-            className="shrink-0 text-smoke-gray hover:text-midnight-charcoal"
+            className="shrink-0 text-white/70 hover:text-white"
             onClick={() => router.back()}
           >
             <ChevronLeft size={16} />
           </Button>
         )}
         <div className="min-w-0">
-          <h1 className="truncate font-heading text-page-title">{title}</h1>
+          <h1 className="truncate font-heading text-page-title text-white">{title}</h1>
           {subtitle && (
-            <p className="truncate text-caption text-smoke-gray">{subtitle}</p>
+            <p className="truncate text-caption text-white/70">{subtitle}</p>
           )}
         </div>
       </div>
