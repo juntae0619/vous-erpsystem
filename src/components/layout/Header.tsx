@@ -30,9 +30,14 @@ export function Header({ title, subtitle, showBack, actions }: HeaderProps) {
           </Button>
         )}
         <div className="min-w-0">
-          <h1 className="truncate font-heading text-page-title text-white">{title}</h1>
+          <h1
+            className="truncate font-heading font-bold"
+            style={{ color: "#fff", fontSize: "1.125rem", letterSpacing: "-0.02em" }}
+          >
+            {title}
+          </h1>
           {subtitle && (
-            <p className="truncate text-caption text-white/70">{subtitle}</p>
+            <p className="truncate text-caption" style={{ color: "rgba(255,255,255,0.75)" }}>{subtitle}</p>
           )}
         </div>
       </div>
