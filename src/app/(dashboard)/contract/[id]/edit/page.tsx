@@ -49,6 +49,7 @@ export default async function EditContractPage({ params }: { params: Promise<{ i
     merchantFeeAmount: contract.merchantFeeAmount ? String(Number(contract.merchantFeeAmount)) : undefined,
     merchantFeeCycle,
     note: contract.note ?? undefined,
+    requiredDocs: contract.requiredDocs ?? undefined,
   };
 
   return (

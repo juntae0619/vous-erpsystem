@@ -185,7 +185,7 @@ function toDateStr(v: unknown): string | null {
   return null;
 }
 
-function resolveDate(...candidates: (string | null | undefined)[]): string {
+function resolveDate(...candidates: unknown[]): string {
   for (const c of candidates) {
     const d = toDateStr(c);
     if (d) return d;
@@ -255,24 +255,6 @@ function parseCards(html: string) {
   return cards;
 }
 
-function findXlsxRow(
-  map: Map<string, Record<string, unknown>>,
-  localGovName: string,
-  contractName: string
-) {
-  const rows = [...map.values()];
-  const exact = rows.find(
-    (r) =>
-      String(r["기관명"] ?? "").trim() === localGovName &&
-      String(r["계약명"] ?? "").trim() === contractName
-  );
-  if (exact) return exact;
-  const byGov = rows.filter(
-    (r) => String(r["기관명"] ?? "").trim() === localGovName
-  );
-  return byGov.length === 1 ? byGov[0] : undefined;
-}
-
 function parseKvTable(html: string) {
   const kv: Record<string, string> = {};
   const rowRe = /<tr>\s*<th>([^<]*)<\/th>\s*<td>([\s\S]*?)<\/td>\s*<th>([^<]*)<\/th>\s*<td>([\s\S]*?)<\/td>\s*<\/tr>/gi;
@@ -322,8 +304,7 @@ function parseBillingRows(html: string): LegacyBillingRow[] {
 function parseContractDetail(
   legacyId: number,
   html: string,
-  xlsxRow?: Record<string, unknown>,
-  xlsxMap?: Map<string, Record<string, unknown>>
+  xlsxRow?: Record<string, unknown>
 ): LegacyContractData {
   const row = xlsxRow;
   const kv = html ? parseKvTable(html) : {};
@@ -491,11 +472,9 @@ export async function fetchLegacyContracts(
           baseUrl,
           `/capp/contract/${legacyId}`
         );
-        contracts.push(
-          parseContractDetail(legacyId, detailHtml, row, xlsxMap)
-        );
+        contracts.push(parseContractDetail(legacyId, detailHtml, row));
       } else {
-        contracts.push(parseContractDetail(0, "", row, xlsxMap));
+        contracts.push(parseContractDetail(0, "", row));
       }
     }
   } else {
@@ -506,7 +485,7 @@ export async function fetchLegacyContracts(
         .match(/<small>([^<]+)<\/small>/)?.[1]
         ?.trim();
       const xlsxRow = previewNum ? xlsxMap.get(previewNum) : undefined;
-      const parsed = parseContractDetail(id, detailHtml, xlsxRow, xlsxMap);
+      const parsed = parseContractDetail(id, detailHtml, xlsxRow);
       if (seen.has(parsed.contractNumber)) continue;
       seen.add(parsed.contractNumber);
       contracts.push(parsed);

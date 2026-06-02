@@ -17,6 +17,7 @@ export function MobileSidebarWrapper({ userRole, userName, userPosition }: Props
 
   // 페이지 이동 시 자동으로 닫기
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 라우트 변경 시 사이드바 닫기
     setOpen(false);
   }, [pathname]);
 

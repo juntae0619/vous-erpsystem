@@ -1,30 +1,15 @@
 import { ok, fail, requireManager } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
+import { loadContractMailSettings, sendContractAlertMail } from "@/lib/contract-mail";
 import { writeAuditLog } from "@/lib/audit";
-import {
-  MAIL_SETTING_KEYS,
-  sendContractAlertMail,
-} from "@/lib/contract-mail";
 import { addDays, format } from "date-fns";
 import { z } from "zod/v4";
-
-async function loadMailSettings() {
-  const rows = await prisma.appSetting.findMany({
-    where: { key: { in: Object.values(MAIL_SETTING_KEYS) } },
-  });
-  const map = new Map(rows.map((r) => [r.key, r.value]));
-  const smtpUser = map.get(MAIL_SETTING_KEYS.smtpUser) ?? "";
-  const smtpPass = map.get(MAIL_SETTING_KEYS.smtpPass) ?? "";
-  const mailTo = map.get(MAIL_SETTING_KEYS.mailTo) ?? "";
-  if (!smtpUser || !smtpPass || !mailTo) return null;
-  return { smtpUser, smtpPass, mailTo };
-}
 
 const bodySchema = z.object({
   test: z.boolean().default(false),
 });
 
-// POST /api/contract/send-alert — 청구 예정일 15일 이내 계약 메일 발송
+// POST /api/contract/send-alert
 export async function POST(req: Request) {
   const { session, error } = await requireManager();
   if (error) return error;
@@ -35,9 +20,12 @@ export async function POST(req: Request) {
     return fail(parsed.error.issues[0]?.message ?? "입력 오류", 400);
   }
 
-  const settings = await loadMailSettings();
+  const settings = await loadContractMailSettings();
   if (!settings) {
-    return fail("메일 설정을 먼저 저장해주세요 (계약·수금 → 메일 설정)", 400);
+    return fail(
+      "메일 설정이 완료되지 않았습니다. 보내는/받는 주소를 저장하고 서버 env에 CONTRACT_SMTP_PASS(또는 SMTP_PASS)를 설정하세요.",
+      400
+    );
   }
 
   const today = new Date();
@@ -47,10 +35,7 @@ export async function POST(req: Request) {
   const contracts = await prisma.contract.findMany({
     where: {
       status: "ACTIVE",
-      nextBillingDate: {
-        gte: today,
-        lte: limit,
-      },
+      nextBillingDate: { gte: today, lte: limit },
     },
     orderBy: { nextBillingDate: "asc" },
   });
@@ -81,7 +66,7 @@ export async function POST(req: Request) {
     const date = c.nextBillingDate
       ? format(c.nextBillingDate, "yyyy-MM-dd")
       : "-";
-    return `- ${c.localGovName} | ${c.contractName} | 다음 청구: ${date} | ${Number(c.serviceAmount).toLocaleString()}원`;
+    return `- ${c.localGovName} | ${c.contractName} | 다음 청구: ${date}`;
   });
 
   const bodyText = [
@@ -110,5 +95,5 @@ export async function POST(req: Request) {
     details: { count: contracts.length },
   });
 
-  return ok({ sent: true, count: contracts.length, contracts: contracts.length });
+  return ok({ sent: true, count: contracts.length });
 }

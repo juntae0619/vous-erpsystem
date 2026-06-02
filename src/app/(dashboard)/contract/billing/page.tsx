@@ -2,7 +2,6 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout/Header";
-import { ContractNav } from "@/components/contract/ContractNav";
 import { formatKRW, cn } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -118,7 +117,6 @@ export default async function ContractBillingPage({
       <Header title="계약·수금 관리" />
       <div className="flex-1 overflow-y-auto p-6">
         <div className="mx-auto max-w-6xl space-y-5">
-          <ContractNav isManager={isManager} />
 
           <div className="flex flex-wrap gap-2">
             {SORT_OPTIONS.map((opt) => (

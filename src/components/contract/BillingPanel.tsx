@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver, type SubmitHandler } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod/v4";
 import { toast } from "sonner";
@@ -62,24 +62,23 @@ const paymentSchema = z.object({
   note: z.string().optional(),
 });
 
+type BillingFormData = z.infer<typeof billingSchema>;
+type PaymentFormData = z.infer<typeof paymentSchema>;
+
 export function BillingPanel({ contractId, billings, canManage }: Props) {
   const router = useRouter();
   const [showBillingForm, setShowBillingForm] = useState(false);
   const [paymentBillingId, setPaymentBillingId] = useState<string | null>(null);
 
-  // 청구 등록 폼
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const billingForm = useForm<z.infer<typeof billingSchema>>({
-    resolver: standardSchemaResolver(billingSchema) as any,
+  const billingForm = useForm<BillingFormData>({
+    resolver: standardSchemaResolver(billingSchema) as Resolver<BillingFormData>,
   });
 
-  // 입금 등록 폼
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const paymentForm = useForm<z.infer<typeof paymentSchema>>({
-    resolver: standardSchemaResolver(paymentSchema) as any,
+  const paymentForm = useForm<PaymentFormData>({
+    resolver: standardSchemaResolver(paymentSchema) as Resolver<PaymentFormData>,
   });
 
-  const submitBilling = async (data: z.infer<typeof billingSchema>) => {
+  const submitBilling: SubmitHandler<BillingFormData> = async (data) => {
     const res = await fetch(`/api/contract/${contractId}/billing`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -97,7 +96,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
     router.refresh();
   };
 
-  const submitPayment = async (data: z.infer<typeof paymentSchema>) => {
+  const submitPayment: SubmitHandler<PaymentFormData> = async (data) => {
     if (!paymentBillingId) return;
     const res = await fetch(`/api/billing/${paymentBillingId}/payment`, {
       method: "POST",
@@ -133,7 +132,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
 
       {/* 청구 등록 폼 */}
       {showBillingForm && (
-        <form onSubmit={billingForm.handleSubmit(submitBilling as any)} className="p-4 bg-[#f8f9fb] rounded-xl mb-4 space-y-3">
+        <form onSubmit={billingForm.handleSubmit(submitBilling)} className="p-4 bg-[#f8f9fb] rounded-xl mb-4 space-y-3">
           <p className="text-body-sm font-medium text-[#292d34]">청구 추가</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
@@ -231,7 +230,7 @@ export function BillingPanel({ contractId, billings, canManage }: Props) {
 
       {/* 입금 등록 폼 (행 선택 시) */}
       {paymentBillingId && (
-        <form onSubmit={paymentForm.handleSubmit(submitPayment as any)} className="mt-4 p-4 bg-[#f8f9fb] rounded-xl space-y-3">
+        <form onSubmit={paymentForm.handleSubmit(submitPayment)} className="mt-4 p-4 bg-[#f8f9fb] rounded-xl space-y-3">
           <p className="text-body-sm font-medium text-[#292d34]">입금 등록</p>
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1">

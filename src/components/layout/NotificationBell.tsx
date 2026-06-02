@@ -48,6 +48,7 @@ export function NotificationBell() {
 
   // 초기 로드 + 30초마다 폴링
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 마운트 시 알림 로드
     fetchNotifications();
     const timer = setInterval(fetchNotifications, 30_000);
     return () => clearInterval(timer);

@@ -14,7 +14,7 @@ import {
   type LocalGovContactData,
 } from "@/components/local-gov/LocalGovContactEditDialog";
 
-interface Contact extends LocalGovContactData {}
+type Contact = LocalGovContactData;
 
 interface Props {
   contacts: Contact[];

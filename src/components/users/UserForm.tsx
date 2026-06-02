@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod/v4";
 import { toast } from "sonner";
@@ -48,7 +48,6 @@ const INPUT_CLS = "h-9 text-body-sm border-[#e8e8e8] rounded-lg focus-visible:ri
 
 export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
   const router = useRouter();
-  const schema = mode === "create" ? createSchema : editSchema;
 
   const {
     register,
@@ -57,7 +56,9 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateForm>({
-    resolver: standardSchemaResolver(schema as any),
+    resolver: standardSchemaResolver(
+      mode === "create" ? createSchema : editSchema
+    ) as Resolver<CreateForm>,
     defaultValues: {
       role: "USER",
       joinedAt: new Date().toISOString().split("T")[0],
@@ -127,8 +128,8 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
                 placeholder="8자 이상"
                 {...register("password")}
               />
-              {(errors as any).password && (
-                <p className="text-caption text-destructive">{(errors as any).password.message}</p>
+              {mode === "create" && errors.password && (
+                <p className="text-caption text-destructive">{errors.password.message}</p>
               )}
             </div>
           )}
@@ -138,7 +139,7 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
             <Label className={LABEL_CLS}>권한 *</Label>
             <Select
               defaultValue={watch("role")}
-              onValueChange={(v) => setValue("role", v as any)}
+              onValueChange={(v) => setValue("role", v as CreateForm["role"])}
             >
               <SelectTrigger className={INPUT_CLS}>
                 <SelectValue placeholder="권한 선택" />

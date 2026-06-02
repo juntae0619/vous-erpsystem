@@ -26,9 +26,9 @@ export async function GET(req: Request) {
     // 내가 제출한 문서
     where.submitterId = userId;
   } else if (pending) {
-    // 내가 결재해야 할 문서 (내가 할당된 PENDING 스텝이 있는 SUBMITTED 문서)
+    // 내가 결재해야 할 문서 (내가 할당된 PENDING 스텝이 있는 진행 중 문서)
     where.steps = { some: { approverId: userId, status: "PENDING" } };
-    where.status = "SUBMITTED";
+    where.status = { in: ["SUBMITTED", "IN_REVIEW"] };
   } else if (role !== "ADMIN" && role !== "MANAGER") {
     // 일반 사용자는 본인 문서만
     where.submitterId = userId;

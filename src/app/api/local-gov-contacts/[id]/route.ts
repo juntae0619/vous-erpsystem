@@ -1,4 +1,4 @@
-import { ok, fail, requireAuth } from "@/lib/api";
+import { ok, fail, requireManager } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod/v4";
 
@@ -23,7 +23,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 // PUT /api/local-gov-contacts/[id]
 export async function PUT(req: Request, { params }: RouteParams) {
-  const { error } = await requireAuth();
+  const { error } = await requireManager();
   if (error) return error;
 
   const { id } = await params;
@@ -58,7 +58,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
 
 // DELETE /api/local-gov-contacts/[id]
 export async function DELETE(_req: Request, { params }: RouteParams) {
-  const { error } = await requireAuth();
+  const { error } = await requireManager();
   if (error) return error;
 
   const { id } = await params;

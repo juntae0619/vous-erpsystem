@@ -56,12 +56,6 @@ interface Assignee {
   position: string | null;
 }
 
-interface Props {
-  assignees: Assignee[];
-  defaultValues?: Partial<FormData>;
-  contractId?: string;
-}
-
 const schema = z.object({
   region: z.string().optional(),
   localGovName: z.string().min(1, "기관명을 입력해주세요"),
@@ -87,7 +81,13 @@ const schema = z.object({
   note: z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
-export type ContractFormData = FormData;
+export type ContractFormData = FormData & { requiredDocs?: string };
+
+interface Props {
+  assignees: Assignee[];
+  defaultValues?: Partial<ContractFormData>;
+  contractId?: string;
+}
 
 export function ContractForm({ assignees, defaultValues, contractId }: Props) {
   const router = useRouter();

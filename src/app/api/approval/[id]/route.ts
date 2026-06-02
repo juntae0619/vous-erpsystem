@@ -1,5 +1,6 @@
 import { ok, fail, requireAuth } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
+import { createNotifications } from "@/lib/notify";
 import { z } from "zod/v4";
 
 // GET /api/approval/[id]
@@ -42,6 +43,15 @@ const updateSchema = z.object({
   expenseAmount: z.number().optional().nullable(),
   expenseItems: z.string().optional().nullable(),
   submit: z.boolean().optional(), // true = 임시저장 → 제출
+  approvalLine: z
+    .array(
+      z.object({
+        role: z.enum(["MANAGER", "DIRECTOR", "CEO"]),
+        approverId: z.string().optional(),
+      })
+    )
+    .min(1)
+    .optional(),
 });
 
 // PUT /api/approval/[id] — 임시저장 수정 또는 제출
@@ -63,16 +73,55 @@ export async function PUT(
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "입력 오류", 400);
   const data = parsed.data;
 
-  const updated = await prisma.approvalDocument.update({
-    where: { id },
-    data: {
-      ...(data.title && { title: data.title }),
-      ...(data.content && { content: data.content }),
-      ...(data.expenseAmount !== undefined && { expenseAmount: data.expenseAmount }),
-      ...(data.expenseItems !== undefined && { expenseItems: data.expenseItems }),
-      ...(data.submit && { status: "SUBMITTED" }),
-    },
+  if (data.submit && (!data.approvalLine || data.approvalLine.length === 0)) {
+    return fail("제출 시 결재선을 설정해주세요", 400);
+  }
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const doc = await tx.approvalDocument.update({
+      where: { id },
+      data: {
+        ...(data.title && { title: data.title }),
+        ...(data.content && { content: data.content }),
+        ...(data.expenseAmount !== undefined && { expenseAmount: data.expenseAmount }),
+        ...(data.expenseItems !== undefined && { expenseItems: data.expenseItems }),
+        ...(data.submit && { status: "SUBMITTED" }),
+      },
+    });
+
+    if (data.submit && data.approvalLine) {
+      await tx.approvalStep.createMany({
+        data: data.approvalLine.map((line, index) => ({
+          documentId: id,
+          stepRole: line.role,
+          approverId: line.approverId ?? null,
+          stepOrder: index + 1,
+          status: "PENDING",
+        })),
+      });
+    }
+
+    return doc;
   });
+
+  if (data.submit) {
+    const managers = await prisma.user.findMany({
+      where: {
+        role: { in: ["MANAGER", "ADMIN"] },
+        id: { not: session!.user.id },
+      },
+      select: { id: true },
+    });
+    await createNotifications(
+      managers.map((m) => ({
+        userId: m.id,
+        type: "APPROVAL_SUBMITTED" as const,
+        title: `결재 요청: ${updated.title}`,
+        message: "새 결재 문서가 제출되었습니다.",
+        link: `/approval/${updated.id}`,
+      }))
+    );
+  }
 
   return ok(updated);
 }

@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VOUS ERP System
 
-## Getting Started
+Next.js(App Router) + Prisma + PostgreSQL 기반 내부 ERP입니다.
 
-First, run the development server:
+## 로컬 개발
 
 ```bash
+cp .env.example .env
+# DATABASE_URL, AUTH_SECRET 등 설정
+
+npm install
+npx prisma migrate dev
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 프로덕션 배포 (PM2)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+서버 예시: `192.168.0.125`, 경로 `/home/vouserp/vous-erpsystem`, PM2 앱명 `vous-erp`
 
-## Learn More
+```bash
+git pull origin main
+npm install
+npx prisma migrate deploy
+npm run build
+pm2 restart vous-erp
+# 최초 실행: pm2 start ecosystem.config.js && pm2 save
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 필수 환경변수
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| 변수 | 설명 |
+|------|------|
+| `DATABASE_URL` | PostgreSQL 연결 문자열 |
+| `AUTH_SECRET` | NextAuth 시크릿 |
+| `AUTH_URL` | 배포 URL (예: `http://192.168.0.125:3000`) |
+| `CONTRACT_SMTP_PASS` | 계약·수금 메일 알림 SMTP 비밀번호 (선택) |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+메일 보내는/받는 주소는 ERP **계약·수금 → 설정** 화면에서 저장합니다.
 
-## Deploy on Vercel
+### 레거시 계약 앱 데이터 이전
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+레거시 `:5000` 앱이 실행 중일 때:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+LEGACY_CONTRACT_APP_URL=http://127.0.0.1:5000 \
+LEGACY_CONTRACT_APP_PASSWORD=1234 \
+npx tsx scripts/migrate-legacy-contracts.ts
+```
+
+또는 관리자로 로그인 후 **설정 → 레거시 데이터 가져오기** API를 사용합니다.
+
+## 주요 기능
+
+- **계약·수금** — 계약 등록/청구/입금, 데이터 품질 점검, 메일 알림
+- **전자결재** — 임시저장, 결재선, 승인/반려/전결
+- **지자체 연락처** — 조회(전체), 등록/수정/삭제(매니저 이상)
+
+## 스크립트
+
+| 명령 | 설명 |
+|------|------|
+| `npm run dev` | 개발 서버 |
+| `npm run build` | 프로덕션 빌드 |
+| `npm run lint` | ESLint |
+| `npx prisma studio` | DB GUI |

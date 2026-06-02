@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { ContractDataQuality } from "@/components/contract/ContractDataQuality";
 
 type MailSettings = {
   smtpUser: string;
   mailTo: string;
-  hasPassword: boolean;
+  hasEnvPassword: boolean;
+  isConfigured: boolean;
 };
 
 type MigratePreview = {
@@ -25,9 +27,9 @@ export function ContractSettingsClient() {
   const [mail, setMail] = useState<MailSettings>({
     smtpUser: "",
     mailTo: "",
-    hasPassword: false,
+    hasEnvPassword: false,
+    isConfigured: false,
   });
-  const [smtpPass, setSmtpPass] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [migrating, setMigrating] = useState(false);
@@ -51,7 +53,6 @@ export function ContractSettingsClient() {
         body: JSON.stringify({
           smtpUser: mail.smtpUser,
           mailTo: mail.mailTo,
-          ...(smtpPass ? { smtpPass } : {}),
         }),
       });
       const json = await res.json();
@@ -60,7 +61,6 @@ export function ContractSettingsClient() {
         return;
       }
       setMail(json.data);
-      setSmtpPass("");
       toast.success("메일 설정 저장됨");
     } finally {
       setSaving(false);
@@ -132,10 +132,15 @@ export function ContractSettingsClient() {
 
   return (
     <div className="space-y-6 max-w-xl">
+      <ContractDataQuality />
+
       <Card className="p-5 space-y-4">
         <h2 className="font-heading text-section-title">메일 설정</h2>
         <p className="text-caption text-smoke-gray">
-          Gmail은 앱 비밀번호(16자리)를 사용하세요. Naver/Gmail SMTP가 자동 선택됩니다.
+          보내는·받는 주소는 여기서 저장합니다. SMTP 비밀번호는 서버{" "}
+          <code className="text-xs">CONTRACT_SMTP_PASS</code> (또는{" "}
+          <code className="text-xs">SMTP_PASS</code>) 환경변수로만 설정하세요.
+          Gmail은 앱 비밀번호(16자리)를 사용합니다.
         </p>
         <div className="space-y-3">
           <div>
@@ -144,19 +149,7 @@ export function ContractSettingsClient() {
               type="email"
               value={mail.smtpUser}
               onChange={(e) => setMail((m) => ({ ...m, smtpUser: e.target.value }))}
-              placeholder="vouskorea3259@naver.com"
-            />
-          </div>
-          <div>
-            <Label>
-              비밀번호 {mail.hasPassword && <span className="text-smoke-gray">(저장됨 — 변경 시만 입력)</span>}
-            </Label>
-            <Input
-              type="password"
-              value={smtpPass}
-              onChange={(e) => setSmtpPass(e.target.value)}
-              placeholder="••••••••"
-              autoComplete="new-password"
+              placeholder="example@naver.com"
             />
           </div>
           <div>
@@ -167,6 +160,17 @@ export function ContractSettingsClient() {
               onChange={(e) => setMail((m) => ({ ...m, mailTo: e.target.value }))}
             />
           </div>
+          <p className="text-caption">
+            env 비밀번호:{" "}
+            <span className={mail.hasEnvPassword ? "text-green-700" : "text-rich-plum"}>
+              {mail.hasEnvPassword ? "설정됨" : "미설정"}
+            </span>
+            {" · "}
+            발송 가능:{" "}
+            <span className={mail.isConfigured ? "text-green-700" : "text-rich-plum"}>
+              {mail.isConfigured ? "예" : "아니오"}
+            </span>
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button onClick={saveMail} disabled={saving}>

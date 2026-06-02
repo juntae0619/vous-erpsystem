@@ -7,8 +7,11 @@ export default auth((req) => {
   const { nextUrl, auth: session } = req;
   const isPublic = PUBLIC_PATHS.some((p) => nextUrl.pathname.startsWith(p));
 
-  // 미로그인 상태에서 보호된 경로 접근 → 로그인으로 리다이렉트
+  // 미로그인 상태에서 보호된 경로 접근
   if (!session && !isPublic) {
+    if (nextUrl.pathname.startsWith("/api/")) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
     const loginUrl = new URL("/login", nextUrl.origin);
     loginUrl.searchParams.set("callbackUrl", nextUrl.pathname);
     return NextResponse.redirect(loginUrl);

@@ -1,4 +1,4 @@
-import { ok, fail, requireAuth } from "@/lib/api";
+import { ok, fail, requireAuth, requireManager } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod/v4";
 
@@ -72,7 +72,7 @@ export async function GET(req: Request) {
 
 // POST /api/local-gov-contacts
 export async function POST(req: Request) {
-  const { error } = await requireAuth();
+  const { error } = await requireManager();
   if (error) return error;
 
   const body = await req.json();

@@ -19,8 +19,11 @@ export function ContractNav({ isManager }: { isManager: boolean }) {
       {visible.map((tab) => {
         const active =
           tab.href === "/contract"
-            ? pathname === "/contract"
-            : pathname.startsWith(tab.href);
+            ? pathname === "/contract" ||
+              (pathname.startsWith("/contract/") &&
+                !pathname.startsWith("/contract/billing") &&
+                !pathname.startsWith("/contract/settings"))
+            : pathname === tab.href || pathname.startsWith(`${tab.href}/`);
         return (
           <Link
             key={tab.href}

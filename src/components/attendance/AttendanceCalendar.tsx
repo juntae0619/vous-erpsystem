@@ -55,6 +55,7 @@ export function AttendanceCalendar({ userId }: AttendanceCalendarProps) {
     }
   }, [year, month, userId]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- 월 변경 시 API 재조회
   useEffect(() => { fetchMonthly(); }, [fetchMonthly]);
 
   function prevMonth() {
@@ -200,7 +201,7 @@ export function AttendanceCalendar({ userId }: AttendanceCalendarProps) {
             <p className="text-caption text-[#b3b3b3]">{label}</p>
             <p className={`text-[20px] font-bold mt-0.5 ${color}`}
                style={{ fontFamily: "var(--font-plus-jakarta-sans)" }}>
-              {(summary as any)[key] ?? 0}
+              {summary[key] ?? 0}
             </p>
           </Card>
         ))}

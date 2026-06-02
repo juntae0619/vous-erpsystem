@@ -1,21 +1,21 @@
 import { ok, fail, requireAdmin, requireManager } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
-import { MAIL_SETTING_KEYS } from "@/lib/contract-mail";
+import { loadContractMailSettings, MAIL_SETTING_KEYS } from "@/lib/contract-mail";
 import { z } from "zod/v4";
 
 async function readSettings() {
   const rows = await prisma.appSetting.findMany({
-    where: {
-      key: {
-        in: Object.values(MAIL_SETTING_KEYS),
-      },
-    },
+    where: { key: { in: Object.values(MAIL_SETTING_KEYS) } },
   });
   const map = new Map(rows.map((r) => [r.key, r.value]));
+  const loaded = await loadContractMailSettings();
   return {
     smtpUser: map.get(MAIL_SETTING_KEYS.smtpUser) ?? "",
     mailTo: map.get(MAIL_SETTING_KEYS.mailTo) ?? "",
-    hasPassword: Boolean(map.get(MAIL_SETTING_KEYS.smtpPass)),
+    hasEnvPassword: Boolean(
+      process.env.CONTRACT_SMTP_PASS ?? process.env.SMTP_PASS
+    ),
+    isConfigured: Boolean(loaded),
   };
 }
 
@@ -28,11 +28,10 @@ export async function GET() {
 
 const updateSchema = z.object({
   smtpUser: z.string().email("올바른 이메일을 입력해주세요"),
-  smtpPass: z.string().optional(),
   mailTo: z.string().email("올바른 받는 주소를 입력해주세요"),
 });
 
-// PUT /api/contract/mail-settings
+// PUT /api/contract/mail-settings — SMTP 비밀번호는 서버 env에만 설정
 export async function PUT(req: Request) {
   const { error } = await requireAdmin();
   if (error) return error;
@@ -43,7 +42,7 @@ export async function PUT(req: Request) {
     return fail(parsed.error.issues[0]?.message ?? "입력 오류", 400);
   }
 
-  const { smtpUser, smtpPass, mailTo } = parsed.data;
+  const { smtpUser, mailTo } = parsed.data;
 
   await prisma.$transaction([
     prisma.appSetting.upsert({
@@ -56,15 +55,6 @@ export async function PUT(req: Request) {
       create: { key: MAIL_SETTING_KEYS.mailTo, value: mailTo },
       update: { value: mailTo },
     }),
-    ...(smtpPass
-      ? [
-          prisma.appSetting.upsert({
-            where: { key: MAIL_SETTING_KEYS.smtpPass },
-            create: { key: MAIL_SETTING_KEYS.smtpPass, value: smtpPass },
-            update: { value: smtpPass },
-          }),
-        ]
-      : []),
   ]);
 
   return ok(await readSettings());
