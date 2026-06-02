@@ -148,6 +148,15 @@ function toNum(v: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+function isValidDateParts(y: number, m: number, d: number): boolean {
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return (
+    dt.getUTCFullYear() === y &&
+    dt.getUTCMonth() === m - 1 &&
+    dt.getUTCDate() === d
+  );
+}
+
 function toDateStr(v: unknown): string | null {
   if (v instanceof Date && !isNaN(v.getTime())) {
     return v.toISOString().slice(0, 10);
@@ -158,8 +167,16 @@ function toDateStr(v: unknown): string | null {
   }
   const s = String(v ?? "").trim();
   if (!s) return null;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-  if (/^\d{4}\/\d{2}\/\d{2}$/.test(s)) return s.replace(/\//g, "-");
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(s)
+    ? s
+    : /^\d{4}\/\d{2}\/\d{2}$/.test(s)
+      ? s.replace(/\//g, "-")
+      : null;
+  if (iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    if (isValidDateParts(y, m, d)) return iso;
+    return null;
+  }
   const n = parseFloat(s);
   if (!isNaN(n) && n > 40000) {
     const d = new Date(Math.round((n - 25569) * 86400 * 1000));
@@ -357,7 +374,8 @@ function parseContractDetail(
     endDate: resolveDate(row?.["완수일"], period?.[2], row?.["착수일"]),
     contractMethod: String(row?.["계약방법"] ?? "").trim() || null,
     serviceAmount:
-      toNum(row?.["계약금액"]) || toNum(cards["계약금액"]),
+      toNum(row?.["계약금액"]) ||
+      toNum(cards["계약금액"]),
     nextBillingDate: toDateStr(row?.["다음청구예정일"]),
     note: String(row?.["비고"] ?? "").trim() || null,
     voucherName: kv["바우처명"] || null,
@@ -395,12 +413,38 @@ async function findLegacyIdByQuery(
   baseUrl: string,
   query: string
 ): Promise<number | null> {
+  if (!query.trim()) return null;
   const html = await session.get(
     baseUrl,
     `/capp/?q=${encodeURIComponent(query)}`
   );
   const id = html.match(/location\.href='\/capp\/contract\/(\d+)'/)?.[1];
   return id ? parseInt(id, 10) : null;
+}
+
+async function findLegacyIdForRow(
+  session: LegacySession,
+  baseUrl: string,
+  row: Record<string, unknown>
+): Promise<number | null> {
+  const contractNumber = String(row["계약번호"] ?? "").trim();
+  const localGovName = String(row["기관명"] ?? "").trim();
+  const contractName = String(row["계약명"] ?? "").trim();
+
+  if (contractNumber) {
+    return (
+      (await findLegacyIdByQuery(session, baseUrl, contractNumber)) ??
+      (await findLegacyIdByQuery(session, baseUrl, contractName)) ??
+      (await findLegacyIdByQuery(session, baseUrl, localGovName))
+    );
+  }
+
+  if (contractName) {
+    const byName = await findLegacyIdByQuery(session, baseUrl, contractName);
+    if (byName) return byName;
+  }
+
+  return findLegacyIdByQuery(session, baseUrl, localGovName);
 }
 
 export async function fetchLegacyContracts(
@@ -440,18 +484,7 @@ export async function fetchLegacyContracts(
       if (seen.has(dedupeKey)) continue;
       seen.add(dedupeKey);
 
-      const legacyId = contractNumber
-        ? ((await findLegacyIdByQuery(session, baseUrl, contractNumber)) ??
-          (await findLegacyIdByQuery(
-            session,
-            baseUrl,
-            String(row["기관명"] ?? "").trim()
-          )))
-        : await findLegacyIdByQuery(
-            session,
-            baseUrl,
-            String(row["기관명"] ?? "").trim()
-          );
+      const legacyId = await findLegacyIdForRow(session, baseUrl, row);
 
       if (legacyId) {
         const detailHtml = await session.get(
