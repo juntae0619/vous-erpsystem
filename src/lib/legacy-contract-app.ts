@@ -149,6 +149,13 @@ function toNum(v: unknown): number {
 }
 
 function toDateStr(v: unknown): string | null {
+  if (v instanceof Date && !isNaN(v.getTime())) {
+    return v.toISOString().slice(0, 10);
+  }
+  if (typeof v === "number" && v > 40000) {
+    const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+    return d.toISOString().slice(0, 10);
+  }
   const s = String(v ?? "").trim();
   if (!s) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
@@ -370,6 +377,7 @@ function loadXlsxRows(buffer?: ArrayBuffer | Buffer) {
   const sheet = wb.Sheets[wb.SheetNames[0]];
   return XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
     defval: "",
+    raw: false,
   });
 }
 
