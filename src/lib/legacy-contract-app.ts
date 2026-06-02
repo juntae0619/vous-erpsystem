@@ -153,7 +153,20 @@ function toDateStr(v: unknown): string | null {
   if (!s) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
   if (/^\d{4}\/\d{2}\/\d{2}$/.test(s)) return s.replace(/\//g, "-");
+  const n = parseFloat(s);
+  if (!isNaN(n) && n > 40000) {
+    const d = new Date(Math.round((n - 25569) * 86400 * 1000));
+    return d.toISOString().slice(0, 10);
+  }
   return null;
+}
+
+function resolveDate(...candidates: (string | null | undefined)[]): string {
+  for (const c of candidates) {
+    const d = toDateStr(c);
+    if (d) return d;
+  }
+  return new Date().toISOString().slice(0, 10);
 }
 
 function decodeHtml(text: string) {
@@ -193,7 +206,8 @@ function selectedOption(rowHtml: string, name: string): string {
 
 function parseBillingMethod(text: string) {
   const cycleKey =
-    text.match(/\/\s*(10일|15일|한달|분기|반기|연간)/)?.[1] ?? "분기";
+    text.match(/\/\s*(10일|15일|한달|분기|반기|연간)/)?.[1] ??
+    (text.includes("매월") ? "한달" : "분기");
   const rateMatch = text.match(/정률\s*\(([0-9.]+)%\)/);
   const isFixed = text.includes("정액");
 
@@ -326,16 +340,14 @@ function parseContractDetail(
     contactPhone: String(row?.["연락처"] ?? "").trim() || null,
     contractName:
       String(row?.["계약명"] ?? "").trim() || contractNameFromKv || "",
-    contractDate:
-      toDateStr(row?.["계약일"]) ??
-      period?.[1] ??
-      new Date().toISOString().slice(0, 10),
+    contractDate: resolveDate(
+      row?.["계약일"],
+      period?.[1],
+      row?.["착수일"]
+    ),
     commencementDate:
       toDateStr(row?.["착수일"]) ?? period?.[1] ?? null,
-    endDate:
-      toDateStr(row?.["완수일"]) ??
-      period?.[2] ??
-      new Date().toISOString().slice(0, 10),
+    endDate: resolveDate(row?.["완수일"], period?.[2], row?.["착수일"]),
     contractMethod: String(row?.["계약방법"] ?? "").trim() || null,
     serviceAmount:
       toNum(row?.["계약금액"]) || toNum(cards["계약금액"]),
