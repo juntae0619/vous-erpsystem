@@ -138,10 +138,13 @@ export function ContractSettingsClient() {
         <h2 className="font-heading text-section-title">메일 설정</h2>
         <p className="text-caption text-smoke-gray">
           보내는·받는 주소는 여기서 저장합니다. SMTP 비밀번호는 서버{" "}
-          <code className="text-xs">CONTRACT_SMTP_PASS</code> (또는{" "}
-          <code className="text-xs">SMTP_PASS</code>) 환경변수로만 설정하세요.
-          Gmail은 앱 비밀번호(16자리)를 사용합니다.
+          <code className="text-xs">CONTRACT_SMTP_PASS</code> 환경변수로만 설정하세요.
         </p>
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-caption text-amber-950">
+          <strong className="font-semibold">Naver 메일:</strong> 로그인 비밀번호로는 발송되지 않습니다.
+          네이버 메일 → 환경설정 → POP3/IMAP·SMTP <strong>사용함</strong> → 네이버ID 보안설정에서{" "}
+          <strong>2단계 인증</strong> 후 <strong>애플리케이션 비밀번호</strong>를 발급해 env에 넣으세요.
+        </div>
         <div className="space-y-3">
           <div>
             <Label>보내는 계정</Label>

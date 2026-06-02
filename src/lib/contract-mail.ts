@@ -74,3 +74,19 @@ export async function sendContractAlertMail(
     text: body,
   });
 }
+
+/** SMTP 오류를 사용자용 한글 메시지로 변환 */
+export function formatSmtpError(err: unknown, smtpUser?: string): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  if (/535|Username and Password not accepted|authentication/i.test(raw)) {
+    if (smtpUser && /@naver\.com/i.test(smtpUser)) {
+      return (
+        "네이버 SMTP 로그인이 거부되었습니다. 일반 로그인 비밀번호는 사용할 수 없습니다. " +
+        "① 네이버 메일 환경설정에서 POP3/IMAP·SMTP 사용함 ② 2단계 인증 설정 " +
+        "③ 애플리케이션 비밀번호 발급 후 서버 CONTRACT_SMTP_PASS에 입력하세요."
+      );
+    }
+    return "SMTP 로그인 실패: 아이디 또는 비밀번호(앱 비밀번호)를 확인하세요.";
+  }
+  return raw;
+}

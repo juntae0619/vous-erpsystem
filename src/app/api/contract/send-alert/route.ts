@@ -1,6 +1,6 @@
 import { ok, fail, requireManager } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
-import { loadContractMailSettings, sendContractAlertMail } from "@/lib/contract-mail";
+import { loadContractMailSettings, sendContractAlertMail, formatSmtpError } from "@/lib/contract-mail";
 import { writeAuditLog } from "@/lib/audit";
 import { addDays, format } from "date-fns";
 import { z } from "zod/v4";
@@ -49,8 +49,7 @@ export async function POST(req: Request) {
       );
       return ok({ test: true, sent: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "메일 발송 실패";
-      return fail(msg, 502);
+      return fail(formatSmtpError(err, settings.smtpUser), 502);
     }
   }
 
@@ -84,8 +83,7 @@ export async function POST(req: Request) {
       bodyText
     );
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "메일 발송 실패";
-    return fail(msg, 502);
+    return fail(formatSmtpError(err, settings.smtpUser), 502);
   }
 
   await writeAuditLog({
