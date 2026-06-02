@@ -305,6 +305,8 @@ model Contract {
   assigneeId        String
   contractFileUrl   String?
   status            ContractStatus   @default(ACTIVE)
+  voucherName       String?          // 바우처명
+  voucherType       String?          // 바우처 유형
   hasMerchantFee    Boolean          @default(false)
   merchantFeeType   MerchantFeeType?
   merchantFeeRate   Decimal?         @db.Decimal(5, 2)
@@ -333,6 +335,10 @@ model Billing {
   taxInvoiceDate   DateTime?        @db.Date
   paymentStatus    PaymentStatus    @default(UNPAID)
   paidAmount       Decimal          @default(0) @db.Decimal(15, 0)
+  billPeriod       String?          // 청구 기간 (예: 2026-01)
+  billPeriodRange  String?          // 청구 기간 범위 (예: 2026-01-01 ~ 2026-01-31)
+  billMonth        String?          // 청구 월 (예: 2026-01)
+  merchantSales    Decimal          @default(0) @db.Decimal(15, 0)  // 가맹점 매출
   note             String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -411,6 +417,14 @@ model AuditLog {
 // ============================================================
 // 지자체 담당자 연락처
 // ============================================================
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("app_settings")
+}
 
 model LocalGovContact {
   id           String   @id @default(cuid())

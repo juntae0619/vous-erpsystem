@@ -5,6 +5,8 @@ import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { ContractPageActions } from "@/components/contract/ContractPageActions";
+import { ContractNav } from "@/components/contract/ContractNav";
+import { ContractAlertBar } from "@/components/contract/ContractAlertBar";
 import { FileText, Search } from "lucide-react";
 import { formatKRW, cn } from "@/lib/utils";
 
@@ -103,6 +105,9 @@ export default async function ContractPage({
       <Header title="계약·수금 관리" actions={managerActions} />
       <div className="flex-1 overflow-y-auto p-6">
         <div className="mx-auto max-w-6xl space-y-5">
+          <ContractNav isManager={isManager} />
+
+          {isManager && <ContractAlertBar />}
 
           {/* 검색 + 필터 */}
           <form method="get" className="flex flex-wrap items-center gap-3">
