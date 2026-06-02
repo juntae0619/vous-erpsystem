@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Bell, Check, CheckCheck, ExternalLink } from "lucide-react";
+import { Bell, CheckCheck, ExternalLink } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { HEADER_ICON_BTN_CLASS } from "@/components/layout/header-icon-styles";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 
@@ -93,26 +93,26 @@ export function NotificationBell() {
 
   return (
     <div ref={dropdownRef} className="relative">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative w-8 h-8 rounded-lg hover:bg-[#e9ebf0] text-[#b3b3b3] hover:text-[#292d34]"
+      <button
+        type="button"
+        className={`${HEADER_ICON_BTN_CLASS} relative`}
+        aria-label="알림"
         onClick={() => {
           setOpen((v) => !v);
           if (!open) fetchNotifications();
         }}
       >
-        <Bell size={16} />
+        <Bell size={22} strokeWidth={2} />
         {unreadCount > 0 && (
-          <Badge className="absolute -top-0.5 -right-0.5 w-4 h-4 p-0 flex items-center justify-center text-[9px] bg-[#7b68ee] text-white border-0 rounded-full">
+          <Badge className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 flex items-center justify-center text-[10px] font-bold bg-[#ff6b6b] text-white border-2 border-[#1a7a5e] rounded-full">
             {unreadCount > 9 ? "9+" : unreadCount}
           </Badge>
         )}
-      </Button>
+      </button>
 
       {open && (
         <div
-          className="absolute right-0 top-10 w-[340px] bg-white border border-[#e8e8e8] rounded-xl shadow-lg z-50 overflow-hidden"
+          className="absolute right-0 top-12 w-[340px] bg-white border border-[#e8e8e8] rounded-xl shadow-lg z-50 overflow-hidden"
           style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}
         >
           {/* 헤더 */}

@@ -1,10 +1,31 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { HEADER_ICON_BTN_CLASS } from "@/components/layout/header-icon-styles";
+import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+
+export { HEADER_ICON_BTN_CLASS };
+
+export function HeaderIconLink({
+  href,
+  children,
+  "aria-label": ariaLabel,
+}: {
+  href: string;
+  children: ReactNode;
+  "aria-label"?: string;
+}) {
+  return (
+    <Link href={href} className={HEADER_ICON_BTN_CLASS} aria-label={ariaLabel}>
+      {children}
+    </Link>
+  );
+}
 
 interface HeaderProps {
   title: string;
@@ -23,10 +44,10 @@ export function Header({ title, subtitle, showBack, actions }: HeaderProps) {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="shrink-0 text-white/70 hover:text-white"
+            className="shrink-0 text-white/80 hover:bg-white/15 hover:text-white"
             onClick={() => router.back()}
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={20} />
           </Button>
         )}
         <div className="min-w-0">
@@ -42,7 +63,7 @@ export function Header({ title, subtitle, showBack, actions }: HeaderProps) {
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <div className={cn("flex shrink-0 items-center", actions ? "gap-2.5" : "")}>
         {actions}
         <NotificationBell />
       </div>

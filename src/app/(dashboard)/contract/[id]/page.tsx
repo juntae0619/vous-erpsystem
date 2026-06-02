@@ -1,16 +1,14 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Header } from "@/components/layout/Header";
+import { Header, HeaderIconLink } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
 import { ContractStatusBadge } from "@/components/contract/ContractStatusBadge";
 import { BillingPanel } from "@/components/contract/BillingPanel";
 import { Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { formatKRW, cn } from "@/lib/utils";
+import { formatKRW } from "@/lib/utils";
 import { BILLING_CYCLE_MAP } from "@/lib/billing-cycle";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -67,12 +65,9 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
         showBack
         actions={
           isManager ? (
-            <Link
-              href={`/contract/${id}/edit`}
-              className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "w-8 h-8 rounded-lg hover:bg-[#e9ebf0] text-[#b3b3b3]")}
-            >
-              <Pencil size={14} />
-            </Link>
+            <HeaderIconLink href={`/contract/${id}/edit`} aria-label="계약 수정">
+              <Pencil size={22} strokeWidth={2} />
+            </HeaderIconLink>
           ) : undefined
         }
       />
