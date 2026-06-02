@@ -58,7 +58,7 @@ export function UserForm({ mode, userId, defaultValues }: UserFormProps) {
   } = useForm<CreateForm>({
     resolver: standardSchemaResolver(
       mode === "create" ? createSchema : editSchema
-    ) as Resolver<CreateForm>,
+    ) as unknown as Resolver<CreateForm>,
     defaultValues: {
       role: "USER",
       joinedAt: new Date().toISOString().split("T")[0],
